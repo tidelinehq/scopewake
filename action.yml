@@ -1,0 +1,38 @@
+name: Tideline
+description: Map what each AI agent in this repo and runner can reach. The scan is local and read-only; installing the package uses the network.
+branding:
+  icon: map
+  color: green
+inputs:
+  path:
+    description: Directory to scan
+    default: "."
+  fail-above:
+    description: Fail the job if any agent scores above this (0-100). Empty means never fail.
+    default: ""
+  format:
+    description: text, json, md, mermaid or sarif
+    default: text
+  version:
+    description: tideline version to install. Defaults to the version this action release was reviewed with.
+    default: "0.2.0"
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - shell: bash
+      env:
+        LM_VERSION: ${{ inputs.version }}
+      run: |
+        pip install "tideline==$LM_VERSION"
+    - shell: bash
+      env:
+        LM_PATH: ${{ inputs.path }}
+        LM_FAIL: ${{ inputs.fail-above }}
+        LM_FORMAT: ${{ inputs.format }}
+      run: |
+        args=(scan "$LM_PATH" --format "$LM_FORMAT")
+        if [ -n "$LM_FAIL" ]; then args+=(--fail-above "$LM_FAIL"); fi
+        tideline "${args[@]}"

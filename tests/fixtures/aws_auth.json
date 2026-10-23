@@ -1,0 +1,51 @@
+{
+  "UserDetailList": [
+    {"UserName": "alice-admin", "Arn": "arn:aws:iam::111122223333:user/alice-admin", "GroupList": ["admins"],
+     "UserPolicyList": [], "AttachedManagedPolicies": []},
+    {"UserName": "dev-agent", "Arn": "arn:aws:iam::111122223333:user/dev-agent", "GroupList": [],
+     "UserPolicyList": [{"PolicyName": "read-app-bucket", "PolicyDocument": {"Version": "2012-10-17", "Statement": [
+        {"Effect": "Allow", "Action": ["s3:GetObject", "s3:ListBucket", "s3:DeleteObject"], "Resource": "arn:aws:s3:::app-data/*"},
+        {"Effect": "Deny", "Action": "s3:DeleteObject", "Resource": "*"},
+        {"Effect": "Allow", "Action": "sts:AssumeRole", "Resource": "arn:aws:iam::111122223333:role/deploy-role"}]}}],
+     "AttachedManagedPolicies": []},
+    {"UserName": "readonly-bot", "Arn": "arn:aws:iam::111122223333:user/readonly-bot", "GroupList": [],
+     "UserPolicyList": [{"PolicyName": "describe", "PolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Action%22%3A%22ec2%3ADescribe%2A%22%2C%22Resource%22%3A%22%2A%22%7D%5D%7D"}],
+     "AttachedManagedPolicies": []},
+    {"UserName": "power", "Arn": "arn:aws:iam::111122223333:user/power", "GroupList": [], "UserPolicyList": [],
+     "AttachedManagedPolicies": [{"PolicyName": "PowerUserAccess", "PolicyArn": "arn:aws:iam::aws:policy/PowerUserAccess"}]},
+    {"UserName": "bounded", "Arn": "arn:aws:iam::111122223333:user/bounded", "GroupList": [], "UserPolicyList": [],
+     "AttachedManagedPolicies": [{"PolicyName": "AdministratorAccess", "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"}],
+     "PermissionsBoundary": {"PermissionsBoundaryType": "Policy", "PermissionsBoundaryArn": "arn:aws:iam::111122223333:policy/s3-read-boundary"}},
+    {"UserName": "passer", "Arn": "arn:aws:iam::111122223333:user/passer", "GroupList": [],
+     "UserPolicyList": [{"PolicyName": "lambda-deployer", "PolicyDocument": {"Statement": [
+        {"Effect": "Allow", "Action": ["iam:PassRole", "lambda:CreateFunction"], "Resource": "*"}]}}],
+     "AttachedManagedPolicies": []},
+    {"UserName": "cond", "Arn": "arn:aws:iam::111122223333:user/cond", "GroupList": [],
+     "UserPolicyList": [{"PolicyName": "mfa-secrets", "PolicyDocument": {"Statement": [
+        {"Effect": "Allow", "Action": "secretsmanager:GetSecretValue", "Resource": "*",
+         "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}}]}}],
+     "AttachedManagedPolicies": []}
+  ],
+  "GroupDetailList": [
+    {"GroupName": "admins", "Arn": "arn:aws:iam::111122223333:group/admins", "GroupPolicyList": [],
+     "AttachedManagedPolicies": [{"PolicyName": "AdministratorAccess", "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"}]}
+  ],
+  "RoleDetailList": [
+    {"RoleName": "deploy-role", "Arn": "arn:aws:iam::111122223333:role/deploy-role",
+     "AssumeRolePolicyDocument": {"Statement": [{"Effect": "Allow", "Principal": {"AWS": "arn:aws:iam::111122223333:user/dev-agent"}, "Action": "sts:AssumeRole"}]},
+     "RolePolicyList": [{"PolicyName": "deploy", "PolicyDocument": {"Statement": [
+        {"Effect": "Allow", "Action": ["secretsmanager:GetSecretValue", "lambda:UpdateFunctionCode"], "Resource": "*"}]}}],
+     "AttachedManagedPolicies": []},
+    {"RoleName": "untrusting-role", "Arn": "arn:aws:iam::111122223333:role/untrusting-role",
+     "AssumeRolePolicyDocument": {"Statement": [{"Effect": "Allow", "Principal": {"Service": "ec2.amazonaws.com"}, "Action": "sts:AssumeRole"}]},
+     "RolePolicyList": [], "AttachedManagedPolicies": [{"PolicyName": "AdministratorAccess", "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"}]}
+  ],
+  "Policies": [
+    {"PolicyName": "AdministratorAccess", "Arn": "arn:aws:iam::aws:policy/AdministratorAccess", "DefaultVersionId": "v1",
+     "PolicyVersionList": [{"VersionId": "v1", "IsDefaultVersion": true, "Document": {"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*"}]}}]},
+    {"PolicyName": "s3-read-boundary", "Arn": "arn:aws:iam::111122223333:policy/s3-read-boundary", "DefaultVersionId": "v2",
+     "PolicyVersionList": [
+       {"VersionId": "v1", "IsDefaultVersion": false, "Document": {"Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*"}]}},
+       {"VersionId": "v2", "IsDefaultVersion": true, "Document": {"Statement": [{"Effect": "Allow", "Action": "s3:Get*", "Resource": "*"}]}}]}
+  ]
+}

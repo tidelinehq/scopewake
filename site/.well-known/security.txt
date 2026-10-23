@@ -1,0 +1,5 @@
+# PLACEHOLDER: replace Contact with a real address or the GitHub advisory URL before launch, and renew Expires yearly.
+Contact: https://github.com/tideline/tideline/security/advisories/new
+Expires: 2027-10-21T00:00:00Z
+Preferred-Languages: en
+Canonical: https://tideline.dev/.well-known/security.txt

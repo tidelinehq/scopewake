@@ -1,0 +1,640 @@
+<title>Tideline</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one motif. The tideline (the mark water leaves at its highest reach) is a wavy band; it is the hero, the section tabs, the button edge, the list bullet and the footer blocks. Dark graphite page (developers mostly work in dark themes), light-grey fields alternate, signal amber is the one brand colour: unused by the eleven competitors surveyed, read as a warning mark. */
+:root {
+  --bg: #16181b;
+  --surface: #222427;
+  --surface-2: #2b2e32;
+  --ink: #eff0f1;
+  --muted: #a3a6ab;
+  --accent: #ffb020;
+  --accent-ink: #18191b;
+  --field: #e9eaec;
+  --field-ink: #18191b;
+  --field-muted: #55585e;
+  --line: #3a3d42;
+  --display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --text: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --step-hero: clamp(3.2rem, 1.5rem + 8vw, 9.5rem);
+  --radius: 6px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--text); font-size: var(--step-body); line-height: 1.5; letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.04em; line-height: 0.95; margin: 0; text-wrap: balance; }
+p { margin: 0; max-width: 60ch; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+.mono { font-family: var(--mono); }
+.small { font-size: var(--step-small); }
+
+/* Top bar */
+.topbar { position: relative; z-index: 3; }
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding-block: 18px; }
+.topbar .accentbar { height: 6px; background: var(--accent); }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 1.05rem; letter-spacing: -0.02em; text-decoration: none; }
+.wordmark svg { width: 28px; height: 14px; }
+.topbar nav { display: flex; gap: 22px; font-size: 0.95rem; color: var(--muted); }
+.topbar nav a { text-decoration: none; }
+.topbar nav a:hover { color: var(--ink); }
+.status { font-family: var(--mono); font-size: var(--step-small); color: var(--muted); border: 1px solid var(--line); padding: 4px 10px; border-radius: 999px; }
+
+/* Hero: headline above a stack of tidelines, each a section */
+.hero { position: relative; overflow: hidden; }
+.hero .wrap { padding-block: clamp(40px, 7vw, 96px) 0; }
+.hero h1 { font-size: var(--step-hero); max-width: 12ch; }
+.hero h1 .reach { color: var(--accent); display: inline-block; white-space: nowrap; }
+.hero .sub { margin-top: 24px; font-size: var(--step-lead); color: var(--muted); max-width: 46ch; line-height: 1.35; }
+.hero .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; border: 0; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink); font: 600 1rem/1 var(--text); letter-spacing: -0.01em;
+  padding: 18px 22px 16px; text-decoration: none;
+  clip-path: url(#wave-top-clip);
+  border-radius: 0 0 var(--radius) var(--radius);
+  transition: transform 160ms var(--ease-out);
+}
+.btn:active { transform: scale(0.97); }
+.btn.ghost { background: transparent; color: var(--ink); clip-path: none; border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; }
+.cmd { font-family: var(--mono); font-size: 0.95rem; color: var(--muted); }
+.cmd b { color: var(--ink); font-weight: 500; }
+
+.strata { position: relative; margin-top: clamp(40px, 6vw, 80px); height: clamp(300px, 34vw, 440px); }
+.stratum {
+  position: absolute; left: 0; right: 0; height: 100%;
+  display: block; text-decoration: none;
+}
+.stratum svg.wave { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stratum .tab {
+  position: absolute; font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.02em;
+  padding: 6px 12px; color: var(--accent-ink);
+}
+.stratum:hover .tab { text-decoration: underline; }
+.s1 { top: 0; } .s2 { top: 13%; } .s3 { top: 26%; } .s4 { top: 39%; } .s5 { top: 52%; }
+.s1 .tab { left: 8%; top: 4%; } .s2 .tab { left: 30%; top: 4%; } .s3 .tab { left: 52%; top: 4%; } .s4 .tab { left: 72%; top: 4%; }
+.s5 .open { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); top: 26%; max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 18px 40px; align-items: baseline; color: var(--accent-ink); }
+.s5 .open .label { font-family: var(--mono); font-size: var(--step-small); }
+.s5 .open .line { font-size: var(--step-lead); font-weight: 600; letter-spacing: -0.02em; }
+
+/* Sections */
+section { position: relative; }
+.field { background: var(--field); color: var(--field-ink); }
+.field .muted { color: var(--field-muted); }
+.muted { color: var(--muted); }
+.sec { padding-block: clamp(64px, 9vw, 128px); }
+.eyebrow { font-family: var(--mono); font-size: var(--step-small); letter-spacing: 0.04em; color: var(--muted); }
+.field .eyebrow { color: var(--field-muted); }
+h2 { font-size: var(--step-head); }
+
+/* Live reach map */
+.reach-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 4vw, 64px); align-items: start; margin-top: 40px; }
+.agent-pick { display: grid; gap: 8px; }
+.agent-pick button {
+  text-align: left; cursor: pointer; border: 0; background: transparent; color: var(--field-ink);
+  font: 500 1.05rem/1.3 var(--text); padding: 14px 16px 14px 44px; position: relative; border-radius: var(--radius);
+  transition: background-color 160ms var(--ease-out), opacity 160ms var(--ease-out);
+}
+.agent-pick button .where { display: block; font: 400 var(--step-small)/1.4 var(--mono); color: var(--field-muted); }
+.agent-pick button::before {
+  content: ""; position: absolute; left: 14px; top: 20px; width: 18px; height: 9px;
+  background: var(--field-muted); clip-path: url(#wave-top-clip-sm);
+}
+.agent-pick button[aria-pressed="true"] { background: var(--field-ink); color: var(--field); }
+.agent-pick button[aria-pressed="true"] .where { color: #b5b8bd; }
+.agent-pick button[aria-pressed="true"]::before { background: var(--accent); }
+@media (hover: hover) { .agent-pick button:not([aria-pressed="true"]):hover { background: #dcdee1; } }
+.agent-pick .note { margin-top: 18px; font-size: var(--step-small); }
+
+.map[data-ui] {
+  background: var(--bg); color: var(--ink); border-radius: var(--radius); overflow: hidden;
+  font-size: 0.95rem; position: relative;
+}
+.map .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.map .head .title { font-family: var(--mono); font-size: var(--step-small); color: var(--muted); }
+.map .score { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.map .score b { font-size: 1.6rem; color: var(--accent); font-weight: 500; }
+.levels { position: relative; }
+.level { position: relative; display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); min-height: 58px; z-index: 1; }
+.level:last-child { border-bottom: 0; }
+.level .name { font-family: var(--mono); font-size: var(--step-small); color: var(--muted); padding-top: 3px; }
+.level .items { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.chip { font-family: var(--mono); font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+.chip.hit { background: rgba(255,176,32,0.16); color: #ffe2a8; }
+.chip.hit::before { content: "● "; color: var(--accent); }
+.waterline { position: absolute; left: 0; right: 0; top: 0; height: 0; background: linear-gradient(to bottom, rgba(255,176,32,0.10), rgba(255,176,32,0.04)); z-index: 0; pointer-events: none; }
+.waterline svg { position: absolute; left: 0; bottom: -7px; width: 100%; height: 14px; }
+.map .foot { padding: 14px 18px; border-top: 1px solid var(--line); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: var(--step-small); }
+.flag { font-family: var(--mono); font-size: 0.78rem; padding: 3px 8px; border-radius: 4px; background: var(--accent); color: var(--accent-ink); }
+.flag.off { background: var(--surface-2); color: var(--muted); }
+.example { position: absolute; right: 14px; bottom: 14px; }
+
+/* How it works: slider-driven split */
+.how { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 640px; }
+.how .left { background: var(--bg); padding: clamp(40px, 6vw, 88px) max(16px, 4vw); display: flex; flex-direction: column; justify-content: space-between; gap: 32px; }
+.how .right { background: var(--surface); padding: clamp(32px, 5vw, 72px) max(16px, 3vw); display: grid; place-items: center; }
+.clause { font-size: clamp(2.2rem, 1.2rem + 3.4vw, 4.6rem); font-weight: 600; letter-spacing: -0.04em; line-height: 0.98; min-height: 2.1em; }
+.clause .ord { color: var(--accent); }
+.how .desc { color: var(--muted); max-width: 44ch; min-height: 4.6em; }
+.term[data-ui] { width: min(100%, 460px); background: #0f1011; border-radius: var(--radius); font-family: var(--mono); font-size: 0.86rem; line-height: 1.6; overflow: hidden; }
+.term .bar { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1px solid #26282b; }
+.term .bar i { width: 9px; height: 9px; border-radius: 50%; background: #3a3d42; display: block; }
+.term pre { margin: 0; padding: 16px; white-space: pre-wrap; word-break: break-word; color: #d6d8db; min-height: 230px; }
+.term .p { color: var(--accent); }
+.term .d { color: #8b8f95; }
+.term .r { color: #ffc65c; }
+.stages { display: grid; gap: 12px; }
+.stages input[type=range] { width: 100%; appearance: none; -webkit-appearance: none; background: transparent; height: 32px; cursor: pointer; }
+.stages input[type=range]::-webkit-slider-runnable-track { height: 8px; background: linear-gradient(to right, var(--ink) var(--pct, 0%), var(--line) var(--pct, 0%)); }
+.stages input[type=range]::-moz-range-track { height: 8px; background: var(--line); }
+.stages input[type=range]::-moz-range-progress { height: 8px; background: var(--ink); }
+.stages input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; margin-top: -12px; background: var(--accent); border: 0; border-radius: 0; }
+.stages input[type=range]::-moz-range-thumb { width: 32px; height: 32px; background: var(--accent); border: 0; border-radius: 0; }
+.stage-names { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); font-size: 0.95rem; color: var(--muted); }
+.stage-names button { all: unset; cursor: pointer; }
+.stage-names button[aria-current="step"] { color: var(--ink); }
+.swap { transition: opacity 200ms var(--ease-out); }
+.swap.fade { opacity: 0; }
+
+/* Proof board */
+.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 0; }
+.tile { background: var(--surface); padding: 22px; min-height: 200px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; border-radius: var(--radius); min-width: 0; }
+.tile .big { font-size: clamp(2.4rem, 1.4rem + 2.6vw, 3.8rem); font-weight: 600; letter-spacing: -0.04em; line-height: 0.95; font-variant-numeric: tabular-nums; }
+.tile .what { color: var(--muted); font-size: 0.98rem; }
+.tile .src { font-family: var(--mono); font-size: 0.75rem; color: #7d8086; }
+.tile.lead { grid-column: span 2; background: var(--accent); color: var(--accent-ink); }
+.tile.lead h2 { font-size: clamp(2rem, 1.2rem + 2.4vw, 3.4rem); }
+.tile.lead p { color: #3b2a05; }
+.tile.prod { background: var(--surface-2); }
+.board-note { margin-top: 18px; font-size: var(--step-small); color: var(--muted); }
+
+/* Pricing */
+.price-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 5vw, 80px); align-items: center; min-height: 64vh; }
+.figure { position: relative; }
+.numerals { font-size: clamp(7rem, 3rem + 14vw, 15rem); font-weight: 600; letter-spacing: -0.06em; line-height: 0.85; font-variant-numeric: tabular-nums; }
+.numerals sup { font-size: 0.5em; vertical-align: top; position: relative; top: 0.08em; margin-right: 0.04em; }
+.numerals .per { font-size: 1.05rem; letter-spacing: 0; font-weight: 500; margin-left: 10px; }
+.figure .overlap { position: absolute; right: 0; top: -6%; width: min(46%, 320px); height: 38%; }
+.included { margin: 26px 0 28px; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 1.1rem; }
+.plans { margin-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; max-width: 640px; }
+.plan { background: #dcdee1; padding: 18px; border-radius: var(--radius); }
+.plan b { display: block; font-size: 1.05rem; }
+.plan span { font-size: 0.95rem; }
+
+/* FAQ: tabbed cards */
+.cards { position: relative; margin-top: 36px; max-width: 900px; }
+.card { position: relative; margin-top: -10px; }
+.card:first-child { margin-top: 0; }
+.card .tabh { display: inline-block; font-family: var(--mono); font-size: 0.85rem; padding: 10px 18px 8px; clip-path: url(#wave-top-clip); }
+.card .body { padding: 18px 22px 22px; border-radius: 0 var(--radius) var(--radius) var(--radius); }
+.card button.q { all: unset; cursor: pointer; display: block; width: 100%; font-size: 1.2rem; font-weight: 500; letter-spacing: -0.015em; }
+.card .a { overflow: hidden; height: 0; }
+.card .a p { padding-top: 12px; max-width: 58ch; font-size: 1.02rem; }
+.card.c1 .tabh, .card.c1 .body { background: var(--surface-2); }
+.card.c2 .tabh, .card.c2 .body { background: #34373c; }
+.card.c3 .tabh, .card.c3 .body { background: var(--surface); }
+.card:nth-child(1) .tabh { margin-left: 0; } .card:nth-child(2) .tabh { margin-left: 8%; } .card:nth-child(3) .tabh { margin-left: 16%; } .card:nth-child(4) .tabh { margin-left: 24%; } .card:nth-child(5) .tabh { margin-left: 32%; } .card:nth-child(6) .tabh { margin-left: 40%; }
+.card.open .a { height: auto; }
+
+/* CTA */
+.cta { background: var(--accent); color: var(--accent-ink); }
+.cta-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(28px, 5vw, 80px); align-items: end; min-height: 72vh; padding-block: clamp(56px, 8vw, 112px); }
+.cta h2 { font-size: clamp(3rem, 1.6rem + 6vw, 7rem); line-height: 0.92; }
+.cta p { margin-top: 18px; color: #3b2a05; }
+.dialog[data-ui] { background: var(--bg); color: var(--ink); border-radius: 10px; width: min(100%, 460px); justify-self: end; box-shadow: 0 30px 60px -20px rgba(24,25,27,0.55); overflow: hidden; }
+.dialog .dh { padding: 18px 20px 6px; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.02em; }
+.dialog .db { padding: 10px 20px 20px; display: grid; gap: 14px; }
+.dialog label { font-size: var(--step-small); color: var(--muted); display: grid; gap: 6px; }
+.dialog input[type=text] { font: 400 0.95rem var(--mono); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; width: 100%; }
+.seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--surface); border-radius: var(--radius); padding: 3px; }
+.seg button { all: unset; cursor: pointer; text-align: center; padding: 9px; border-radius: 4px; font-size: 0.92rem; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--ink); }
+.out { font-family: var(--mono); font-size: 0.85rem; background: #0f1011; border-radius: var(--radius); padding: 12px; color: #d6d8db; overflow-x: auto; white-space: pre; }
+.dialog .btn { width: 100%; justify-content: center; }
+.copied { font-size: var(--step-small); color: var(--muted); min-height: 1.4em; }
+
+/* Footer: wordmark built from tideline blocks */
+footer { background: var(--bg); padding-block: clamp(48px, 7vw, 96px) 28px; }
+.blocks { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; align-items: end; height: clamp(150px, 26vw, 320px); }
+.blk { position: relative; background: var(--surface-2); height: var(--h); display: grid; place-items: end start; padding: 0 0 6px 8px; }
+.blk:nth-child(3n) { background: var(--surface); }
+.blk.hot { background: var(--accent); }
+.blk span { font-size: clamp(2rem, 1rem + 5vw, 6.5rem); font-weight: 600; letter-spacing: -0.05em; line-height: 0.8; color: var(--ink); }
+.blk.hot span { color: var(--accent-ink); }
+.blk::before { content: ""; position: absolute; left: 0; right: 0; top: -7px; height: 8px; background: inherit; clip-path: url(#wave-top-clip-sm); }
+.foot-grid { margin-top: 56px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; font-size: 0.95rem; }
+.foot-grid h3 { font-size: 0.85rem; font-family: var(--mono); font-weight: 400; letter-spacing: 0.02em; color: var(--muted); margin-bottom: 10px; line-height: 1.3; }
+.foot-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.foot-grid a { text-decoration: none; color: var(--ink); }
+.foot-grid a:hover { text-decoration: underline; }
+.legal { margin-top: 48px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: var(--step-small); color: var(--muted); }
+
+@media (max-width: 860px) {
+  .topbar nav { display: none; }
+  .reach-grid, .price-grid, .cta-grid { grid-template-columns: minmax(0, 1fr); }
+  .how { grid-template-columns: minmax(0, 1fr); }
+  .how .right { order: -1; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .tile.lead { grid-column: span 2; min-height: 140px; }
+  .tile { min-height: 160px; padding: 16px; }
+  .figure .overlap { display: none; }
+  .dialog[data-ui] { justify-self: stretch; width: 100%; }
+  .foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .plans { grid-template-columns: minmax(0, 1fr); }
+  .card:nth-child(n) .tabh { margin-left: calc((var(--i, 0)) * 6%); }
+  .s1 .tab { left: 4%; } .s2 .tab { left: 30%; } .s3 .tab { left: 56%; } .s4 .tab { left: 6%; top: 4%; }
+  .strata { height: 380px; }
+  .s5 .open { top: 22%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- The tideline: a gentle irregular wave along the top edge -->
+    <clipPath id="wave-top-clip" clipPathUnits="objectBoundingBox">
+      <path d="M0,0.12 C0.08,0.02 0.16,0.02 0.25,0.1 C0.34,0.18 0.42,0.16 0.5,0.08 C0.58,0 0.67,0.02 0.75,0.1 C0.84,0.18 0.92,0.16 1,0.06 L1,1 L0,1 Z"/>
+    </clipPath>
+    <clipPath id="wave-top-clip-sm" clipPathUnits="objectBoundingBox">
+      <path d="M0,0.5 C0.17,0 0.33,0 0.5,0.45 C0.67,0.9 0.83,0.9 1,0.4 L1,1 L0,1 Z"/>
+    </clipPath>
+  </defs>
+</svg>
+
+<header class="topbar">
+  <div class="accentbar"></div>
+  <div class="wrap">
+    <a class="wordmark" href="#top" aria-label="Tideline home">
+      <svg viewBox="0 0 28 14" aria-hidden="true"><path d="M0 8 C4 2 8 2 12 7 C16 12 20 12 24 6 C25 5 27 4 28 4 L28 14 L0 14 Z" fill="#ffb020"/></svg>
+      Tideline
+    </a>
+    <nav aria-label="Sections">
+      <a href="#reach">Reach map</a><a href="#how">How it works</a><a href="#why">Why now</a><a href="#price">Pricing</a><a href="#faq">FAQ</a>
+    </nav>
+    <span class="status">pre-release</span>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <h1 class="split-in">See how far your agents <span class="reach" id="reachword" aria-label="reach.">reach.</span></h1>
+    <p class="sub">Tideline maps what every AI agent can touch: the credentials it can read, the tools it can call, and the systems those open. Before an attacker or a bad prompt finds out for you.</p>
+    <div class="actions">
+      <a class="btn" href="#start">Run your first scan</a>
+      <span class="cmd">$ <b>tideline scan .</b> &nbsp;local, read-only, no account</span>
+    </div>
+  </div>
+  <div class="strata" aria-label="Sections of this page">
+    <a class="stratum s1" href="#reach"><svg class="wave" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 C150,0 300,0 450,26 C600,52 750,48 900,22 C1020,4 1110,8 1200,20 L1200,400 L0,400 Z" fill="#2b2e32"/></svg><span class="tab" style="color:#eff0f1">Reach map</span></a>
+    <a class="stratum s2" href="#how"><svg class="wave" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true"><path d="M0,22 C140,46 290,48 430,24 C570,0 720,2 860,28 C990,50 1100,44 1200,24 L1200,400 L0,400 Z" fill="#34373c"/></svg><span class="tab" style="color:#eff0f1">How it works</span></a>
+    <a class="stratum s3" href="#why"><svg class="wave" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true"><path d="M0,26 C160,4 320,4 470,28 C620,52 770,46 920,20 C1040,2 1120,6 1200,18 L1200,400 L0,400 Z" fill="#e9eaec"/></svg><span class="tab">Why now</span></a>
+    <a class="stratum s4" href="#price"><svg class="wave" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true"><path d="M0,18 C130,40 280,44 420,22 C560,2 710,4 850,26 C990,48 1100,40 1200,22 L1200,400 L0,400 Z" fill="#c9cbcf"/></svg><span class="tab">Pricing</span></a>
+    <div class="stratum s5" aria-hidden="false"><svg class="wave" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true"><path d="M0,24 C150,2 300,2 450,24 C600,46 750,46 900,24 C1030,6 1120,6 1200,16 L1200,400 L0,400 Z" fill="#ffb020"/></svg>
+      <div class="open"><span class="label">highest reach found in the example scan</span><span class="line">Claude Code on a laptop → production AWS admin, via ~/.aws/credentials</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="field sec" id="reach">
+  <div class="wrap">
+    <p class="eyebrow">Reach map · try it</p>
+    <h2 style="margin-top:12px">Pick an agent. Watch the water rise.</h2>
+    <p class="muted" style="margin-top:14px">Each row is a layer of your stack, from local files down to production data. The line stops at the deepest layer the agent can reach with what it already holds.</p>
+    <div class="reach-grid">
+      <div>
+        <div class="agent-pick" role="group" aria-label="Choose an agent">
+          <button type="button" aria-pressed="true" data-agent="cc">Claude Code<span class="where">developer laptop · shell + MCP servers</span></button>
+          <button type="button" aria-pressed="false" data-agent="gha">Issue-triage bot<span class="where">GitHub Action · runs on public issues</span></button>
+          <button type="button" aria-pressed="false" data-agent="sup">Support agent<span class="where">helpdesk + Postgres + email</span></button>
+        </div>
+        <p class="note muted">Example scan of a fictional company. Real scans read config files on your machine and list credential kinds and locations, never their values.</p>
+      </div>
+      <div class="map" data-ui>
+        <div class="head"><span class="title" id="map-title">claude-code · ~/projects/api</span><span class="score">reach <b id="score">88</b>/100</span></div>
+        <div class="levels" id="levels">
+          <div class="waterline" id="waterline"><svg viewBox="0 0 1200 14" preserveAspectRatio="none" aria-hidden="true"><path d="M0,7 C150,0 300,0 450,7 C600,14 750,14 900,7 C1050,0 1125,2 1200,6" fill="none" stroke="#ffb020" stroke-width="3" vector-effect="non-scaling-stroke"/></svg></div>
+          <div class="level" data-l="0"><span class="name">local files</span><div class="items"></div></div>
+          <div class="level" data-l="1"><span class="name">code &amp; CI</span><div class="items"></div></div>
+          <div class="level" data-l="2"><span class="name">SaaS</span><div class="items"></div></div>
+          <div class="level" data-l="3"><span class="name">cloud</span><div class="items"></div></div>
+          <div class="level" data-l="4"><span class="name">production data</span><div class="items"></div></div>
+        </div>
+        <div class="foot"><span class="flag" id="trifecta">potential lethal trifecta</span><span class="muted" id="fix">Fix: move AWS keys to SSO with a read-only role for this repo.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how" aria-labelledby="how-h">
+  <div class="how">
+    <div class="left">
+      <div>
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-h" class="clause swap" style="margin-top:14px"><span class="ord">First,</span> install it locally.</h2>
+        <p class="desc swap" id="how-desc" style="margin-top:20px">One Python package with no dependencies. It opens no network connection and writes nothing to your system.</p>
+      </div>
+      <div class="stages">
+        <label for="stage" class="small muted">Drag through the four stages, or use the arrow keys</label>
+        <input id="stage" type="range" min="0" max="3" step="1" value="0" aria-valuetext="Install">
+        <div class="stage-names" role="group" aria-label="Stages">
+          <button type="button" data-s="0" aria-current="step">Install</button>
+          <button type="button" data-s="1">Scan</button>
+          <button type="button" data-s="2">Map</button>
+          <button type="button" data-s="3">Gate</button>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="term" data-ui aria-live="polite"><div class="bar"><i></i><i></i><i></i></div><pre class="swap" id="term"></pre></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="why">
+  <div class="wrap">
+    <div class="board">
+      <div class="tile lead"><h2>Buyers already pay for this map.</h2><p>Large security companies have spent billions buying tools that answer "who can access what". Agents are the newest "who".</p></div>
+      <div class="tile"><div class="big">$1.2B</div><div><p class="what">ServiceNow's purchase of Veza, an effective-permissions graph</p><p class="src">closed Mar 2026 · market fact</p></div></div>
+      <div class="tile"><div class="big">$637M</div><div><p class="what">CrowdStrike's purchase of SGNL, real-time authorisation</p><p class="src">closed Feb 2026 · market fact</p></div></div>
+      <div class="tile"><div class="big">13</div><div><p class="what">machine and agent identity security companies acquired since 2023</p><p class="src">NHI consolidation tracker · market fact</p></div></div>
+      <div class="tile prod"><div class="big">0</div><div><p class="what">network connections opened during a scan, enforced by tests</p><p class="src">Tideline · product fact</p></div></div>
+      <div class="tile prod"><div class="big">54</div><div><p class="what">automated tests, including regression tests for two independent code audits</p><p class="src">Tideline · product fact</p></div></div>
+      <div class="tile prod"><div class="big">8</div><div><p class="what">agent hosts detected today: Claude Code, Cursor, Windsurf, VS Code, Claude Desktop, Gemini CLI, Codex CLI, GitHub Actions</p><p class="src">Tideline · product fact</p></div></div>
+    </div>
+    <p class="board-note">Market facts describe the category, not Tideline's customers. Tideline has no customers yet.</p>
+  </div>
+</section>
+
+<section class="field sec" id="price">
+  <div class="wrap">
+    <div class="price-grid">
+      <div>
+        <p class="eyebrow">Pricing</p>
+        <h2 style="margin-top:12px;font-size:clamp(1.8rem,1.2rem + 1.6vw,2.4rem)">Free where you work.</h2>
+        <p class="muted" style="margin-top:16px">The scanner is open source and runs on your machine and in CI at no cost. Paid plans are for teams that need it set up, kept current and turned into evidence.</p>
+        <div class="plans">
+          <div class="plan"><b>Team &middot; US$299/month</b><span>Drift gates set up across your repos, a monthly reach report, priority detection requests.</span></div>
+          <div class="plan"><b>Organisation &middot; US$15,000/year</b><span>Approval review for every AI use case, evidence packs mapped to your regulators, quarterly re-approval review.</span></div>
+          <div class="plan"><b>Singapore financial institutions</b><span>MAS AI risk management readiness assessment, S$1,500. Annual evidence programme from S$15,000.</span></div>
+        </div>
+      </div>
+      <div class="figure">
+        <div class="numerals" aria-label="Zero dollars per month"><sup>$</sup>0<span class="per">/ month, open source</span></div>
+        <svg class="overlap" viewBox="0 0 320 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 C50,6 100,6 160,30 C220,54 270,54 320,26 L320,120 L0,120 Z" fill="#ffb020"/></svg>
+        <ul class="included">
+          <li>Local scan of every agent config on the machine</li>
+          <li>Text, JSON, Markdown, Mermaid and SARIF reports</li>
+          <li>CI gate that fails when an agent's reach grows</li>
+          <li>Approval review that flags AI approvals a change has made stale</li>
+          <li>MIT licence</li>
+        </ul>
+        <a class="btn" href="#start">Get the command</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="faq">
+  <div class="wrap">
+    <p class="eyebrow">Questions</p>
+    <h2 style="margin-top:12px">Before you run it.</h2>
+    <div class="cards" id="cards">
+      <div class="card c1 open"><span class="tabh">secrets</span><div class="body"><button class="q" type="button" aria-expanded="true" aria-controls="a1">Does Tideline read my secret values?</button><div class="a" id="a1"><p>It reads configuration files to learn that a credential exists, what kind it is and where it lives. Known secret shapes are redacted from every output format, and tests plant synthetic secrets to check this. Redaction is pattern-based, so an unusual format placed in a name or path could slip through; the docs say so.</p></div></div></div>
+      <div class="card c2"><span class="tabh">network</span><div class="body"><button class="q" type="button" aria-expanded="false" aria-controls="a2">Does it send anything anywhere?</button><div class="a" id="a2"><p>No. A scan opens no network connection and writes no files. A test fails the build if that changes. Installing the package from PyPI uses the network, as any install does.</p></div></div></div>
+      <div class="card c3"><span class="tabh">agents</span><div class="body"><button class="q" type="button" aria-expanded="false" aria-controls="a3">Which agents does it find?</button><div class="a" id="a3"><p>Claude Code, Cursor, Windsurf, VS Code MCP, Claude Desktop, Gemini CLI, Codex CLI and GitHub Actions agent workflows. Cloud connectors for AWS, GitHub and Google Workspace permissions are in development.</p></div></div></div>
+      <div class="card c1"><span class="tabh">trifecta</span><div class="body"><button class="q" type="button" aria-expanded="false" aria-controls="a4">What is a "lethal trifecta"?</button><div class="a" id="a4"><p>An agent that reads untrusted input, can reach private data and has a way to send data out. Tideline flags it as potential, because config files show what is reachable, not what an agent will actually do.</p></div></div></div>
+      <div class="card c2"><span class="tabh">status</span><div class="body"><button class="q" type="button" aria-expanded="false" aria-controls="a5">Is it ready?</button><div class="a" id="a5"><p>It is a pre-release built by a solo founder in Singapore. The scanner works and is tested; it has not yet been run across many real machines. Issues and detection requests are welcome.</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="start">
+  <div class="wrap">
+    <div class="cta-grid">
+      <div>
+        <h2>Find the high-water mark.</h2>
+        <p>Pick how you install. The command runs a read-only scan of the folder you are in and prints every agent's reach. Nothing leaves your machine.</p>
+      </div>
+      <div class="dialog" data-ui role="group" aria-labelledby="dlg-h">
+        <div class="dh" id="dlg-h">Scan a project</div>
+        <div class="db">
+          <label for="proj">Project folder<input id="proj" type="text" value="~/projects/api" spellcheck="false" autocomplete="off"></label>
+          <div><div class="small muted" style="margin-bottom:6px">Install with</div>
+            <div class="seg" role="group" aria-label="Install method">
+              <button type="button" aria-pressed="true" data-m="pipx">pipx</button>
+              <button type="button" aria-pressed="false" data-m="pip">pip</button>
+            </div>
+          </div>
+          <div class="out" id="out" tabindex="0" aria-label="Command"></div>
+          <button class="btn" type="button" id="copy">Copy command</button>
+          <div class="copied" id="copied" aria-live="polite">Available on PyPI at public launch.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="blocks" aria-label="Tideline">
+      <div class="blk" style="--h:72%"><span>T</span></div>
+      <div class="blk" style="--h:88%"><span>i</span></div>
+      <div class="blk" style="--h:64%"><span>d</span></div>
+      <div class="blk" style="--h:96%"><span>e</span></div>
+      <div class="blk hot" style="--h:100%"><span>l</span></div>
+      <div class="blk" style="--h:78%"><span>i</span></div>
+      <div class="blk" style="--h:60%"><span>n</span></div>
+      <div class="blk" style="--h:84%"><span>e</span></div>
+    </div>
+    <div class="foot-grid">
+      <div><h3>Product</h3><ul><li><a href="#reach">Reach map</a></li><li><a href="#how">How it works</a></li><li><a href="#price">Pricing</a></li></ul></div>
+      <div><h3>Trust</h3><ul><li><a href="#faq">Security FAQ</a></li><li><a href="#why">Why now</a></li></ul></div>
+      <div><h3>Status</h3><ul><li>Pre-release</li><li>MIT licence</li></ul></div>
+      <div><h3>Company</h3><ul><li>Built in Singapore</li><li>Solo founder</li></ul></div>
+    </div>
+    <div class="legal"><span>© 2026 Tideline. Market figures: ServiceNow and CrowdStrike filings, NHI Governance tracker.</span><a class="btn" href="#top" style="padding:12px 16px 10px">Back to top</a></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function () {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hasG = typeof window.gsap !== 'undefined';
+
+  /* Smooth scroll (Lenis) driven by GSAP's ticker */
+  if (!reduce && typeof window.Lenis !== 'undefined' && hasG) {
+    try {
+      const lenis = new Lenis({ duration: 1.05, smoothWheel: true });
+      if (window.ScrollTrigger) { gsap.registerPlugin(ScrollTrigger); lenis.on('scroll', ScrollTrigger.update); }
+      gsap.ticker.add((t) => lenis.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
+      document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href'); const el = id.length > 1 ? document.querySelector(id) : document.body;
+        if (el) { e.preventDefault(); lenis.scrollTo(el, { offset: 0 }); }
+      }));
+    } catch (e) { /* page works without smooth scroll */ }
+  }
+
+
+  /* Hero word: scramble-then-settle, adapted from React Bits "DecryptedText" (vanilla port, original letters only, sequential reveal) */
+  (function () {
+    const el = document.getElementById('reachword'); if (!el) return;
+    const final = el.textContent; const pool = Array.from(new Set(final.replace(/[^a-z]/g, '').split('')));
+    el.style.minWidth = el.getBoundingClientRect().width + 'px';
+    let running = false;
+    function run() {
+      if (running || reduce) return; running = true; let i = 0; let tick = 0;
+      const id = setInterval(() => {
+        tick++; if (tick % 3 === 0) i++;
+        el.textContent = final.split('').map((c, k) => (k < i || c === '.' ? c : pool[(Math.random() * pool.length) | 0])).join('');
+        if (i >= final.length) { clearInterval(id); el.textContent = final; running = false; }
+      }, 45);
+    }
+    setTimeout(run, 500); el.addEventListener('mouseenter', run);
+  })();
+
+  /* Live reach map */
+  const AGENTS = {
+    cc: { title: 'claude-code · ~/projects/api', score: 88, depth: 4, trifecta: true,
+      fix: 'Fix: move AWS keys to SSO with a read-only role for this repo.',
+      levels: [['.env (API_TOKEN)', 'shell execution', 'filesystem'], ['repo write', 'GitHub token: org repos'], ['Slack MCP: post', 'web fetch'], ['~/.aws/credentials: admin'], ['prod Postgres via AWS']] },
+    gha: { title: 'issue-triage.yml · on: issues', score: 71, depth: 2, trifecta: true,
+      fix: 'Fix: drop NPM_TOKEN from this workflow; triggered by untrusted public input.',
+      levels: [['runner filesystem'], ['GITHUB_TOKEN: write', 'NPM_TOKEN: publish', 'issue text (untrusted)'], ['OpenAI key'], [], []] },
+    sup: { title: 'support-agent · helpdesk', score: 64, depth: 4, trifecta: true,
+      fix: 'Fix: give the agent a read-only view without email or card fields.',
+      levels: [[], [], ['helpdesk tickets (untrusted)', 'send email'], [], ['customers table: PII']] },
+  };
+  const levelsEl = document.getElementById('levels');
+  const water = document.getElementById('waterline');
+  function setAgent(key, animate) {
+    const a = AGENTS[key];
+    document.getElementById('map-title').textContent = a.title;
+    document.getElementById('fix').textContent = a.fix;
+    const tri = document.getElementById('trifecta');
+    tri.textContent = a.trifecta ? 'potential lethal trifecta' : 'no trifecta';
+    tri.classList.toggle('off', !a.trifecta);
+    const rows = levelsEl.querySelectorAll('.level');
+    rows.forEach((row, i) => {
+      const box = row.querySelector('.items'); box.innerHTML = '';
+      const items = a.levels[i];
+      if (!items.length) { const c = document.createElement('span'); c.className = 'chip'; c.textContent = 'not reached'; box.appendChild(c); }
+      items.forEach((t) => { const c = document.createElement('span'); c.className = 'chip hit'; c.textContent = t; box.appendChild(c); });
+    });
+    const deepest = rows[a.depth];
+    const h = deepest.offsetTop + deepest.offsetHeight;
+    const scoreEl = document.getElementById('score');
+    if (hasG && animate && !reduce) {
+      gsap.to(water, { height: h, duration: 0.7, ease: 'power3.out' });
+      const o = { v: Number(scoreEl.textContent) || 0 };
+      gsap.to(o, { v: a.score, duration: 0.6, ease: 'power2.out', onUpdate: () => { scoreEl.textContent = Math.round(o.v); } });
+    } else { water.style.height = h + 'px'; scoreEl.textContent = a.score; }
+  }
+  document.querySelectorAll('.agent-pick button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.agent-pick button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    setAgent(b.dataset.agent, true);
+  }));
+  setAgent('cc', false);
+  window.addEventListener('resize', () => { const k = document.querySelector('.agent-pick [aria-pressed="true"]').dataset.agent; setAgent(k, false); });
+
+  /* How it works */
+  const STAGES = [
+    { clause: '<span class="ord">First,</span> install it locally.', desc: 'One Python package with no dependencies. It opens no network connection and writes nothing to your system.',
+      term: '<span class="p">$</span> pipx install tideline\n<span class="d">  installing tideline 0.2.0\n  done: 1 command, 0 dependencies</span>' },
+    { clause: '<span class="ord">Then,</span> scan a folder.', desc: 'It finds agent configs in the project and your home folder, and lists every credential kind and tool each agent can reach.',
+      term: '<span class="p">$</span> tideline scan .\n<span class="d">found 3 agents</span>\n  claude-code   reach <span class="r">88</span>  shell, aws admin, github\n  cursor        reach 41  filesystem, web fetch\n  issue-triage  reach <span class="r">71</span>  npm publish, untrusted input' },
+    { clause: '<span class="ord">Next,</span> read the map.', desc: 'Each agent gets a chain from what it holds to what that opens, with the one change that shrinks it most.',
+      term: '<span class="p">$</span> tideline scan . --format md\n<span class="d">## claude-code  (reach 88)</span>\n  ~/.aws/credentials -> aws admin -> prod db\n  .env API_TOKEN     -> payments api\n  <span class="r">potential lethal trifecta</span>\n<span class="d">  fix: SSO + read-only role for this repo</span>' },
+    { clause: '<span class="ord">Last,</span> gate it in CI.', desc: 'Compare two scans in a pull request. The check fails when any agent can reach more than before.',
+      term: '<span class="p">$</span> tideline diff main.json pr.json --fail-on-increase\n<span class="d">claude-code</span>\n  <span class="r">+ cred  aws: admin</span>\n  <span class="r">+ cap   shell execution</span>\n<span class="r">reach increased</span>  exit 1' },
+  ];
+  const range = document.getElementById('stage');
+  const termEl = document.getElementById('term');
+  const clauseEl = document.getElementById('how-h');
+  const descEl = document.getElementById('how-desc');
+  const names = ['Install', 'Scan', 'Map', 'Gate'];
+  function setStage(i, animate) {
+    const s = STAGES[i];
+    const apply = () => { clauseEl.innerHTML = s.clause; descEl.textContent = s.desc; termEl.innerHTML = s.term; };
+    range.value = i; range.setAttribute('aria-valuetext', names[i]);
+    range.style.setProperty('--pct', (i / 3 * 100) + '%');
+    document.querySelectorAll('.stage-names button').forEach((b) => { if (Number(b.dataset.s) === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    if (!animate || reduce) { apply(); return; }
+    [clauseEl, descEl, termEl].forEach((el) => el.classList.add('fade'));
+    setTimeout(() => { apply(); [clauseEl, descEl, termEl].forEach((el) => el.classList.remove('fade')); }, 200);
+  }
+  range.addEventListener('input', () => setStage(Number(range.value), true));
+  document.querySelectorAll('.stage-names button').forEach((b) => b.addEventListener('click', () => setStage(Number(b.dataset.s), true)));
+  setStage(0, false);
+
+  /* FAQ cards */
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((c, i) => c.style.setProperty('--i', i));
+  function openCard(card) {
+    cards.forEach((c) => {
+      const a = c.querySelector('.a'); const q = c.querySelector('.q'); const open = c === card;
+      q.setAttribute('aria-expanded', String(open)); c.classList.toggle('open', open);
+      if (hasG && !reduce) {
+        if (open) { gsap.fromTo(a, { height: a.offsetHeight }, { height: 'auto', duration: 0.32, ease: 'power3.out' }); }
+        else if (a.offsetHeight) { gsap.to(a, { height: 0, duration: 0.24, ease: 'power3.out' }); }
+      } else { a.style.height = open ? 'auto' : '0px'; }
+    });
+  }
+  cards.forEach((c) => c.querySelector('.q').addEventListener('click', () => openCard(c)));
+
+  /* CTA command builder */
+  const proj = document.getElementById('proj'); const out = document.getElementById('out'); let method = 'pipx';
+  function render() {
+    const p = (proj.value || '.').trim();
+    out.textContent = (method === 'pipx' ? 'pipx install tideline' : 'python3 -m pip install --user tideline') + '\ncd ' + p + ' && tideline scan .';
+  }
+  proj.addEventListener('input', render);
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+    method = b.dataset.m; document.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); render();
+  }));
+  render();
+  const msg = document.getElementById('copied');
+  document.getElementById('copy').addEventListener('click', () => {
+    const text = out.textContent;
+    const done = () => { msg.textContent = 'Copied. The package goes live on PyPI at public launch.'; };
+    try {
+      navigator.clipboard.writeText(text).then(done, () => { selectOut(); msg.textContent = 'Selected. Press Ctrl+C or Cmd+C to copy.'; });
+    } catch (e) { selectOut(); msg.textContent = 'Selected. Press Ctrl+C or Cmd+C to copy.'; }
+  });
+  function selectOut() { const r = document.createRange(); r.selectNodeContents(out); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+  /* Entrances: from a visible resting state (movement only, never hidden) */
+  if (hasG && !reduce && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.from('.stratum', { yPercent: 18, duration: 1.1, ease: 'power3.out', stagger: 0.08 });
+    gsap.from('.hero h1', { y: 28, duration: 0.9, ease: 'power3.out' });
+    gsap.utils.toArray('.tile').forEach((t, i) => gsap.from(t, { y: 24, duration: 0.6, ease: 'power3.out', delay: (i % 4) * 0.05, scrollTrigger: { trigger: t, start: 'top 92%', once: true } }));
+    gsap.from('.numerals', { y: 40, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: '.numerals', start: 'top 90%', once: true } });
+    gsap.utils.toArray('.blk').forEach((b, i) => gsap.from(b, { scaleY: 0.85, transformOrigin: 'bottom', duration: 0.7, ease: 'power3.out', delay: i * 0.04, scrollTrigger: { trigger: '.blocks', start: 'top 95%', once: true } }));
+  }
+})();
+</script>

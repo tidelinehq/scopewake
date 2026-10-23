@@ -1,0 +1,3 @@
+- [ ] Tests added or updated, `python -m unittest discover -s tests` passes
+- [ ] No new dependency; no network/subprocess/eval/write code
+- [ ] No real secret in fixtures, output or docs

@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tideline"
+version = "0.2.0"
+description = "See what each AI agent could reach, and keep AI approvals current when that reach changes. Local, read-only, offline."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = []
+keywords = ["ai-agents", "mcp", "security", "blast-radius", "ai-governance", "mas", "compliance", "claude-code", "cursor"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+]
+
+[project.urls]
+Homepage = "https://github.com/tidelinehq/tideline"
+Source = "https://github.com/tidelinehq/tideline"
+Changelog = "https://github.com/tidelinehq/tideline/blob/main/CHANGELOG.md"
+Issues = "https://github.com/tidelinehq/tideline/issues"
+
+[project.scripts]
+tideline = "tideline.cli:main"
+
+[tool.setuptools]
+packages = ["tideline"]
