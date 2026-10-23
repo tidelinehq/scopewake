@@ -124,6 +124,12 @@ class ApprovalTests(unittest.TestCase):
         for fake in ALL_FAKES:
             self.assertNotIn(fake, text)
 
+    def test_markdown_reasons_are_list_items(self):
+        led = self.ledger()
+        self.add_payments_server()
+        md = apv.review_text(apv.review(led, self.report()[1], D1), markdown=True)
+        self.assertIn("\n- **MCP server added**", md)
+
     def test_unknown_agent_selector_is_an_error(self):
         with self.assertRaises(ValueError):
             apv.approve(apv.empty_ledger(), self.report()[1], "X", ["nope"], "A", D0)

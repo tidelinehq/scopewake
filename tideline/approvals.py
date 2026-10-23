@@ -240,14 +240,19 @@ def review_text(res: dict, markdown: bool = False) -> str:
         L += ["WARNING: the scan was incomplete, so no approval can be shown to be current.", ""]
     for r in res["approvals"]:
         L.append((f"## {safe(r['system'], 80)}: {r['status']}" if markdown else f"[{r['status']}] {safe(r['system'], 80)}"))
-        L.append(f"  approved by {safe(r['approved_by'], 60)} on {r['approved_on']}, valid until {r['valid_until']}"
+        ind = "" if markdown else "  "
+        L.append(f"{ind}approved by {safe(r['approved_by'], 60)} on {r['approved_on']}, valid until {r['valid_until']}"
                  + (f"; owner {safe(r['owner'], 60)}" if r["owner"] else ""))
+        if markdown and r["reasons"]:
+            L.append("")
         for x in r["reasons"]:
-            L.append(f"  {'!' if x.get('review') else '-'} {safe(x['type'], 40)}: {safe(x['detail'], 300)}" + (f"  [{x['ref']}]" if x["ref"] else ""))
+            mark = ("- **" + safe(x["type"], 40) + "**" if x.get("review") else "- " + safe(x["type"], 40)) if markdown else \
+                f"  {'!' if x.get('review') else '-'} {safe(x['type'], 40)}"
+            L.append(f"{mark}: {safe(x['detail'], 300)}" + (f"  [{x['ref']}]" if x["ref"] else ""))
         L.append("")
     if res["unapproved_agents"]:
         L.append(("## Agents with no approval" if markdown else "agents with no approval") + f"  [{res['unapproved_ref']}]")
-        L += [f"  - {safe(k, 200)}" for k in res["unapproved_agents"]]
+        L += [("- " if markdown else "  - ") + safe(k, 200) for k in res["unapproved_agents"]]
     L += ["", res["disclaimer"]]
     return "\n".join(L)
 
