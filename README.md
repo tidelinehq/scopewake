@@ -25,10 +25,11 @@ From source: `python -m tideline scan .`
 ## What it does not do (yet)
 It never calls cloud APIs (AWS reach comes from an IAM export you supply; GCP and Azure are not analysed yet), does not verify credentials are live, does not parse every agent's config format (Codex TOML is detected only), and cannot see agents running outside the scanned locations. Pattern matching can miss unusual secrets and can flag harmless strings.
 
-## AWS: what a key can actually do
+## AWS: what a key could do, according to your IAM export
 
 A file path says an agent *can read* `~/.aws/credentials`. It does not say whether that key is read-only or admin.
-Tideline can answer that offline, from an IAM export you create yourself. Tideline never calls AWS and never reads the key.
+Tideline answers that offline, from an IAM export you create yourself. Tideline never calls AWS and never reads the key.
+The answer is only as complete and as current as the export: it covers what the export contains, as of when you ran it, not everything the credential can do in production now.
 
 ```bash
 # 1. You run this with any IAM read-only identity (needs iam:GetAccountAuthorizationDetails)
