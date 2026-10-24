@@ -1,4 +1,4 @@
-# tideline v0.1.0 security review (author's review, 2026-10-21; not an independent audit)
+# scopewake v0.1.0 security review (author's review, 2026-10-21; not an independent audit)
 
 ## Claims and how each is checked
 | Claim | Check | Result |

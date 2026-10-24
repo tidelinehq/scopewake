@@ -5,9 +5,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tideline.report import to_json, to_markdown, to_mermaid, to_sarif, to_text
-from tideline.scanner import scan
-from tideline.scoring import score_all
+from scopewake.report import to_json, to_markdown, to_mermaid, to_sarif, to_text
+from scopewake.scanner import scan
+from scopewake.scoring import score_all
 
 # Fake secrets are assembled at runtime so no real-looking secret sits in the repo.
 FAKE_GH = "ghp_" + "A1b2C3d4E5" * 3 + "F6g7H8"
@@ -43,7 +43,7 @@ def snapshot(root: Path):
     return sorted((str(p), p.stat().st_mtime_ns, p.stat().st_size) for p in root.rglob("*") if p.is_file())
 
 
-class TidelineTests(unittest.TestCase):
+class ScopewakeTests(unittest.TestCase):
     def setUp(self):
         self._t = tempfile.TemporaryDirectory()
         self.tmp = Path(self._t.name)
@@ -115,7 +115,7 @@ class TidelineTests(unittest.TestCase):
                 self.assertFalse(uri.startswith(("/", "~")), uri)
 
     def test_cli_formats_and_fail_above(self):
-        from tideline import cli
+        from scopewake import cli
         import io, contextlib
         for fmt in ("text", "json", "md", "mermaid", "sarif"):
             buf = io.StringIO()
@@ -186,8 +186,8 @@ class TidelineTests(unittest.TestCase):
         self.assertIn("LM002", {r["ruleId"] for r in sarif["runs"][0]["results"]})
 
     def test_diff_detects_increase_and_decrease(self):
-        from tideline.cli import main
-        from tideline.diff import diff_reports
+        from scopewake.cli import main
+        from scopewake.diff import diff_reports
         a, b = self.tmp / "a.json", self.tmp / "b.json"
         a.write_text(to_json(self.run_scan()))
         cfg = self.home / ".cursor" / "mcp.json"
@@ -259,7 +259,7 @@ class SourcePolicyTests(unittest.TestCase):
     """Release gate: the package must contain no network, subprocess, dynamic-code or write-capable code."""
 
     def test_package_is_clean(self):
-        pkg = Path(__file__).resolve().parent.parent / "tideline"
+        pkg = Path(__file__).resolve().parent.parent / "scopewake"
         files = list(pkg.rglob("*.py"))
         self.assertTrue(files)
         for f in files:
@@ -270,3 +270,15 @@ class SourcePolicyTests(unittest.TestCase):
                         "from os import remove", "import os\nos.open('x', os.O_WRONLY)", "compile('x=1','x','exec')",
                         "getattr(os, 'sys' + 'tem')", "import urllib.request", "open('x','w')", "__import__('socket')"):
             self.assertTrue(policy_violations(snippet), snippet)
+
+
+class LegacyNameTest(unittest.TestCase):
+    def test_diff_accepts_reports_from_tideline(self):
+        from scopewake.diff import normalize
+        legacy = {"tool": "tideline", "version": "0.2.0", "schema": 1, "agents": []}
+        self.assertIsInstance(normalize(legacy), dict)  # a stored tideline baseline still loads
+
+    def test_diff_rejects_other_tools(self):
+        from scopewake.diff import normalize
+        with self.assertRaises(Exception):
+            normalize({"tool": "something-else", "agents": []})

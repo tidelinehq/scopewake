@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Renamed from Tideline to Scopewake: package `scopewake`, command `scopewake`, repository `tidelinehq/scopewake`, website https://scopewake.com. JSON reports now say `"tool": "scopewake"`.
+- `scopewake diff` still accepts reports written by `tideline` 0.2.x, so a stored baseline keeps working.
+- No change to scanning, scoring, approval or review rules.
+
 ## 0.2.0 (first public release)
 
 - `tideline approve` and `tideline review`: approval review. An approval freezes the reach of the agents it covers; `review` marks each approval re-review required, evidence expired, verify, expiring soon or current, cites MAS paras 5.24-5.25 / 4.11, lists agents with no approval, and exports CSV for GRC tools. Any addition to reach counts, whatever its severity. `--fail-on-review` gates CI. Nothing is written: `approve` prints the updated ledger, keeping earlier approvals in its history.

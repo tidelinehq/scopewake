@@ -1,7 +1,7 @@
 """Offline AWS IAM blast-radius analysis.
 
 Input: the JSON written by `aws iam get-account-authorization-details` (the customer runs that command;
-Tideline never calls AWS and never sees a key). Output: for each IAM user or role, which high-impact
+Scopewake never calls AWS and never sees a key). Output: for each IAM user or role, which high-impact
 classes of action it can reach, directly or by assuming other roles.
 
 This is an approximation and says so in every report:
@@ -22,7 +22,7 @@ MAX_HOPS = 3
 
 # (class, severity, probe actions, plain-language impact)
 RISK_CLASSES = [
-    ("full-admin", 10, ["tideline-probe:AnyAction"], "do anything in the AWS account"),
+    ("full-admin", 10, ["scopewake-probe:AnyAction"], "do anything in the AWS account"),
     ("privilege-escalation", 10, [
         "iam:CreatePolicyVersion", "iam:SetDefaultPolicyVersion", "iam:AttachUserPolicy", "iam:AttachRolePolicy",
         "iam:AttachGroupPolicy", "iam:PutUserPolicy", "iam:PutRolePolicy", "iam:PutGroupPolicy",
@@ -370,7 +370,7 @@ LIMITS = ("Offline approximation: service control policies, resource policies, s
 
 def principals_text(rows: List[dict], issues: List[str]) -> str:
     from .safe import safe
-    out = ["tideline aws: IAM principals ranked by worst reachable action class", LIMITS, ""]
+    out = ["scopewake aws: IAM principals ranked by worst reachable action class", LIMITS, ""]
     if issues:
         out += [f"WARNING {len(issues)} part(s) of the export could not be evaluated:"] + [f"  - {safe(i, 200)}" for i in issues] + [""]
     for i, r in enumerate(rows, 1):

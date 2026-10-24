@@ -79,7 +79,7 @@ def _as_report_agent(s: dict) -> dict:
 # ---------------------------------------------------------------- ledger
 
 def empty_ledger() -> dict:
-    return {"tool": "tideline", "kind": LEDGER_KIND, "schema": 1, "approvals": []}
+    return {"tool": "scopewake", "kind": LEDGER_KIND, "schema": 1, "approvals": []}
 
 
 def load_ledger(path: str) -> dict:
@@ -93,7 +93,7 @@ def load_ledger(path: str) -> dict:
     except (UnicodeDecodeError, json.JSONDecodeError, RecursionError):
         raise ValueError(f"approvals ledger {safe(path, 200)} is not valid JSON")
     if not isinstance(data, dict) or data.get("kind") != LEDGER_KIND or not isinstance(data.get("approvals"), list):
-        raise ValueError("not a tideline approvals ledger (expected kind 'approvals' and an 'approvals' list)")
+        raise ValueError("not a scopewake approvals ledger (expected kind 'approvals' and an 'approvals' list)")
     for i, ap in enumerate(data["approvals"]):
         if not isinstance(ap, dict):
             raise ValueError(f"approval {i} is not an object")
@@ -219,7 +219,7 @@ def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS) 
     rows.sort(key=lambda r: (STATUS_ORDER.index(r["status"]), r["system"].lower()))
     unapproved = sorted(set(agent_key(a) for a in current.values()) - covered)
     counts = {s: sum(1 for r in rows if r["status"] == s) for s in STATUS_ORDER}
-    return scrub_tree({"tool": "tideline", "version": __version__, "kind": "approval-review", "date": _iso(today),
+    return scrub_tree({"tool": "scopewake", "version": __version__, "kind": "approval-review", "date": _iso(today),
                        "scan_complete": report["complete"],
                        "disclaimer": "Indicative mapping, not legal advice. The owner decides whether a change is significant.",
                        "summary": counts, "approvals": rows, "unapproved_agents": unapproved,
@@ -235,7 +235,7 @@ def review_text(res: dict, markdown: bool = False) -> str:
     s = res["summary"]
     head = (f"{s['re-review required']} re-review required, {s['evidence expired']} evidence expired, {s['verify']} to verify, "
             f"{s['expiring soon']} expiring soon, {s['current']} current; {len(res['unapproved_agents'])} unapproved agent(s)")
-    L = [("# Approval review" if markdown else "tideline review") + f" ({res['date']})", "", head, ""]
+    L = [("# Approval review" if markdown else "scopewake review") + f" ({res['date']})", "", head, ""]
     if not res["scan_complete"]:
         L += ["WARNING: the scan was incomplete, so no approval can be shown to be current.", ""]
     for r in res["approvals"]:

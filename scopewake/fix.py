@@ -50,7 +50,7 @@ def fixes(agents: List[Agent]) -> dict:
                          "if it needs `id-token: write`, restrict the trusted cloud role's subject and branch conditions.")
     if not cc:
         notes.append("No Claude Code configuration found; managed settings apply to Claude Code only.")
-    return {"tool": "tideline", "kind": "fix",
+    return {"tool": "scopewake", "kind": "fix",
             "claude_code_managed_settings": settings,
             "deploy": "Merge into managed settings (admin console, MDM plist/registry, or managed-settings.json); "
                       "managed values take precedence over user and project settings.",

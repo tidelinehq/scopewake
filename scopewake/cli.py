@@ -18,7 +18,7 @@ from datetime import date
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(prog="tideline", description="Map what each AI agent on this machine could reach. Local and read-only.")
+    p = argparse.ArgumentParser(prog="scopewake", description="Map what each AI agent on this machine could reach. Local and read-only.")
     p.add_argument("--version", action="version", version=__version__)
     sub = p.add_subparsers(dest="cmd")
     s = sub.add_parser("scan", help="scan a project directory and the user's home for agents and credentials")
@@ -45,7 +45,7 @@ def main(argv=None):
         c = sub.add_parser(name, help=helptext)
         c.add_argument("path", nargs="?", default=".", help="directory to scan (ignored with --report)")
         c.add_argument("--home", default=str(Path.home()))
-        c.add_argument("--report", metavar="FILE", help="use a saved `tideline scan --format json` report instead of scanning")
+        c.add_argument("--report", metavar="FILE", help="use a saved `scopewake scan --format json` report instead of scanning")
         c.add_argument("--aws-auth", metavar="FILE")
         c.add_argument("--aws-as", action="append", default=[], metavar="[AGENT=]PRINCIPAL")
         c.add_argument("--ledger", metavar="FILE", required=(name == "review"), help="approvals ledger (JSON)")
@@ -79,7 +79,7 @@ def main(argv=None):
         try:
             res = diff_reports(args.old, args.new)
         except (OSError, ValueError, RecursionError) as e:
-            print(f"tideline diff: {safe(e, 400)}", file=sys.stderr)
+            print(f"scopewake diff: {safe(e, 400)}", file=sys.stderr)
             return 2
         print(json.dumps(scrub_tree(res), indent=2, allow_nan=False) if args.format == "json" else scrub(diff_text(res)))
         return 1 if args.fail_on_increase and res["worse"] else 0
@@ -87,10 +87,10 @@ def main(argv=None):
         try:
             rows, aissues = awsmod.analyse(awsmod.load_export(args.export))
         except (OSError, ValueError) as e:
-            print(f"tideline aws: {safe(e, 400)}", file=sys.stderr)
+            print(f"scopewake aws: {safe(e, 400)}", file=sys.stderr)
             return 2
         if args.format == "json":
-            print(json.dumps(scrub_tree({"tool": "tideline", "version": __version__, "note": awsmod.LIMITS,
+            print(json.dumps(scrub_tree({"tool": "scopewake", "version": __version__, "note": awsmod.LIMITS,
                                          "coverage": {"complete": not aissues, "issues": aissues}, "principals": rows}), indent=2))
         else:
             print(scrub(awsmod.principals_text(rows, aissues)))
@@ -113,7 +113,7 @@ def main(argv=None):
             try:
                 inv = comp.load_inventory(args.inventory)
             except ValueError as e:
-                print(f"tideline compliance: {safe(e, 400)}", file=sys.stderr)
+                print(f"scopewake compliance: {safe(e, 400)}", file=sys.stderr)
                 return 2
         fws = args.framework or ["mas-airm"]
         fws = list(comp.FRAMEWORKS) if "all" in fws else list(dict.fromkeys(fws))
@@ -123,17 +123,17 @@ def main(argv=None):
                 ledger = apv.load_ledger(args.approvals)
                 rev = apv.review(ledger, normalize(json.loads(to_json(agents, issues)), "<scan>"), date.today())
             except ValueError as e:
-                print(f"tideline compliance: {safe(e, 400)}", file=sys.stderr)
+                print(f"scopewake compliance: {safe(e, 400)}", file=sys.stderr)
                 return 2
         pack = comp.build_pack(agents, inv, fws, issues, rev)
         print(json.dumps(pack, indent=2) if args.format == "json" else scrub(comp.pack_markdown(pack)))
         if issues:
-            print(f"tideline: incomplete scan, {len(issues)} problem(s); results may understate risk.", file=sys.stderr)
+            print(f"scopewake: incomplete scan, {len(issues)} problem(s); results may understate risk.", file=sys.stderr)
         return 0
     render = {"text": to_text, "json": to_json, "md": to_markdown, "mermaid": to_mermaid, "sarif": to_sarif}[args.format]
     print(scrub(render(agents, issues)))
     if issues:
-        print(f"tideline: incomplete scan, {len(issues)} problem(s); results may understate risk.", file=sys.stderr)
+        print(f"scopewake: incomplete scan, {len(issues)} problem(s); results may understate risk.", file=sys.stderr)
     if args.fail_above is not None and any(a.score > args.fail_above for a in agents):
         return 1
     if issues and args.fail_above is not None and not args.allow_incomplete:
@@ -153,7 +153,7 @@ def _live(args):
 
 
 def _approvals(args):
-    name = f"tideline {args.cmd}"
+    name = f"scopewake {args.cmd}"
     try:
         today = date.fromisoformat(args.today) if args.today else date.today()
         if args.report:

@@ -6,12 +6,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tideline import scanner
-from tideline.cli import main
-from tideline.diff import diff_reports
-from tideline.report import to_json, to_markdown, to_mermaid, to_sarif, to_text
-from tideline.scanner import classify_server, scan
-from tideline.scoring import score_all
+from scopewake import scanner
+from scopewake.cli import main
+from scopewake.diff import diff_reports
+from scopewake.report import to_json, to_markdown, to_mermaid, to_sarif, to_text
+from scopewake.scanner import classify_server, scan
+from scopewake.scoring import score_all
 
 MARK = "ghp_" + "A" * 36
 
@@ -114,8 +114,8 @@ class AuditRegressions(unittest.TestCase):
 
     def test_c5_malformed_report_is_a_clean_error(self):
         old, new = self.t / "o.json", self.t / "n.json"
-        write(old, {"tool": "tideline", "agents": [{"id": "x", "credentials": None}]})
-        write(new, {"tool": "tideline", "agents": [{"id": "x"}]})
+        write(old, {"tool": "scopewake", "agents": [{"id": "x", "credentials": None}]})
+        write(new, {"tool": "scopewake", "agents": [{"id": "x"}]})
         self.assertEqual(self.run_cli("diff", str(old), str(new))[0], 2)
 
     def test_c6_ancestor_symlink_is_not_followed(self):
@@ -151,8 +151,8 @@ class AuditRegressions(unittest.TestCase):
     def test_c9_action_pins_the_package_version(self):
         text = (Path(__file__).resolve().parent.parent / "action.yml").read_text()
         self.assertNotIn('default: ""\nruns', text.split("version:")[1].split("runs:")[0] + "runs")
-        self.assertIn("tideline==", text)
-        self.assertNotIn("pip install tideline;", text)
+        self.assertIn("scopewake==", text)
+        self.assertNotIn("pip install scopewake;", text)
 
     def test_c10_sarif_keeps_repo_relative_paths(self):
         write(self.p / ".github/workflows/agent.yml",

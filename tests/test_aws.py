@@ -6,10 +6,10 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
-from tideline import aws
-from tideline.cli import main
-from tideline.model import Agent, Credential
-from tideline.scoring import score_agent
+from scopewake import aws
+from scopewake.cli import main
+from scopewake.model import Agent, Credential
+from scopewake.scoring import score_agent
 
 FIX = Path(__file__).parent / "fixtures" / "aws_auth.json"
 

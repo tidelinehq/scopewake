@@ -1,4 +1,4 @@
-"""Compare two `tideline scan --format json` reports. Pure file comparison; no scanning, no network."""
+"""Compare two `scopewake scan --format json` reports. Pure file comparison; no scanning, no network."""
 import json
 import math
 from pathlib import Path
@@ -54,9 +54,9 @@ def _load(path: str) -> dict:
 
 
 def normalize(data, path: str = "<report>") -> dict:
-    """Validate a parsed tideline JSON report and reduce each agent to the fields that define its reach."""
-    if not isinstance(data, dict) or data.get("tool") != "tideline" or not isinstance(data.get("agents"), list):
-        raise _err(path, "not a tideline JSON report")
+    """Validate a parsed scopewake (or legacy tideline) JSON report and reduce each agent to the fields that define its reach."""
+    if not isinstance(data, dict) or data.get("tool") not in ("scopewake", "tideline") or not isinstance(data.get("agents"), list):
+        raise _err(path, "not a scopewake JSON report")
     cov = data.get("coverage")
     complete = True
     if cov is not None:
@@ -194,7 +194,7 @@ def diff_reports(old_path: str, new_path: str) -> dict:
 
 def diff_text(d: dict) -> str:
     head = "reach INCREASED" if d["worse"] else "reach decreased or unchanged"
-    lines = ["tideline diff: " + head, ""]
+    lines = ["scopewake diff: " + head, ""]
     if not d["new_complete"]:
         lines += ["WARNING: the new scan was incomplete, so this result cannot show that reach did not grow.", ""]
     elif not d["old_complete"]:

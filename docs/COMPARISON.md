@@ -1,9 +1,9 @@
-# Tideline vs. the nearest tools
+# Scopewake vs. the nearest tools
 
 Checked 21 Oct 2026 against the public Snyk Agent Scan README (github.com/snyk/agent-scan: 3.2k stars, Apache-2.0).
 Only claims taken from that README are listed for Snyk. Not benchmarked head to head: that needs Snyk's account and token, which we have not created.
 
-| | Tideline | Snyk Agent Scan |
+| | Scopewake | Snyk Agent Scan |
 |---|---|---|
 | Account or token | None | Snyk account and `SNYK_TOKEN` required (per README) |
 | Network | None, enforced by a test | README warns scans may make outbound requests |
@@ -14,7 +14,7 @@ Only claims taken from that README are listed for Snyk. Not benchmarked head to 
 | Drift between scans (`diff`, CI gate) | Yes | Not stated in README |
 | Exits | text, json, md, mermaid, sarif, `--fail-above` | See their docs |
 
-Honest read: they look for bad things in what the agent loads. Tideline measures how much damage a compromised agent could do. These overlap but are not identical; either can be run alongside the other.
+Honest read: they look for bad things in what the agent loads. Scopewake measures how much damage a compromised agent could do. These overlap but are not identical; either can be run alongside the other.
 Where Snyk is stronger: threat intelligence, 3.2k stars of trust, a vendor behind it, tool-description analysis we do not do.
 Open: the head-to-head on one realistic setup is still to do.
 

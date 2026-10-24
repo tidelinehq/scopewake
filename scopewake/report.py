@@ -13,7 +13,7 @@ def _coverage(issues: Optional[List[str]]) -> dict:
 
 
 def to_json(agents: List[Agent], issues: Optional[List[str]] = None) -> str:
-    doc = {"tool": "tideline", "version": __version__, "schema": 1, "coverage": _coverage(issues),
+    doc = {"tool": "scopewake", "version": __version__, "schema": 1, "coverage": _coverage(issues),
            "note": "Capabilities are inferred from config names and launch arguments, not verified.",
            "agents": [a.to_dict() for a in agents]}
     # Redact before serialising: JSON escaping (for example a newline) can hide a secret from a text scrub.
@@ -63,8 +63,8 @@ def to_markdown(agents: List[Agent], issues: Optional[List[str]] = None) -> str:
 def to_text(agents: List[Agent], issues: Optional[List[str]] = None) -> str:
     warn = [f"WARNING incomplete scan ({len(issues)} problem(s)); results may understate risk:"] + [f"  - {safe(i, 200)}" for i in issues] + [""] if issues else []
     if not agents:
-        return "\n".join(warn + ["tideline: no AI agents or agent configs found."])
-    out = warn + ["tideline: agents ranked by worst-case blast radius (capabilities inferred from config, not verified)", ""]
+        return "\n".join(warn + ["scopewake: no AI agents or agent configs found."])
+    out = warn + ["scopewake: agents ranked by worst-case blast radius (capabilities inferred from config, not verified)", ""]
     for i, a in enumerate(agents, 1):
         live = sum(1 for c in a.credentials if not c.mitigated)
         flag = "  POTENTIAL-TRIFECTA" if a.trifecta else ""
@@ -155,7 +155,7 @@ def to_sarif(agents: List[Agent], issues: Optional[List[str]] = None) -> str:
                                     f"private data reachable; outbound via {', '.join(a.trifecta_parts['exfiltration'])}.{src}"},
             }, **where))
     doc = {"version": "2.1.0", "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
-           "runs": [{"tool": {"driver": {"name": "tideline", "version": __version__,
+           "runs": [{"tool": {"driver": {"name": "scopewake", "version": __version__,
                                          "rules": [{"id": "LM001", "name": "AgentBlastRadius",
                                                     "shortDescription": {"text": "AI agent can reach sensitive credentials or capabilities"}},
                                                    {"id": "LM002", "name": "PotentialLethalTrifecta",

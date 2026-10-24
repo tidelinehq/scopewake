@@ -6,14 +6,14 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
-from tideline import compliance as comp
-from tideline.cli import main
-from tideline.fix import fixes
-from tideline.report import to_json
-from tideline.scanner import scan, server_fingerprint
-from tideline.scoring import score_all
-from tideline.diff import diff_reports
-from test_tideline import ALL_FAKES, FAKE_GH, build_fixture
+from scopewake import compliance as comp
+from scopewake.cli import main
+from scopewake.fix import fixes
+from scopewake.report import to_json
+from scopewake.scanner import scan, server_fingerprint
+from scopewake.scoring import score_all
+from scopewake.diff import diff_reports
+from test_scopewake import ALL_FAKES, FAKE_GH, build_fixture
 
 
 def run(argv):

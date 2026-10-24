@@ -1,4 +1,4 @@
-name: Tideline
+name: Scopewake
 description: Map what each AI agent in this repo and runner can reach. The scan is local and read-only; installing the package uses the network.
 branding:
   icon: map
@@ -14,8 +14,8 @@ inputs:
     description: text, json, md, mermaid or sarif
     default: text
   version:
-    description: tideline version to install. Defaults to the version this action release was reviewed with.
-    default: "0.2.0"
+    description: scopewake version to install. Defaults to the version this action release was reviewed with.
+    default: "0.3.0"
 runs:
   using: composite
   steps:
@@ -26,7 +26,7 @@ runs:
       env:
         LM_VERSION: ${{ inputs.version }}
       run: |
-        pip install "tideline==$LM_VERSION"
+        pip install "scopewake==$LM_VERSION"
     - shell: bash
       env:
         LM_PATH: ${{ inputs.path }}
@@ -35,4 +35,4 @@ runs:
       run: |
         args=(scan "$LM_PATH" --format "$LM_FORMAT")
         if [ -n "$LM_FAIL" ]; then args+=(--fail-above "$LM_FAIL"); fi
-        tideline "${args[@]}"
+        scopewake "${args[@]}"

@@ -6,12 +6,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tideline import scanner
-from tideline.cli import main
-from tideline.diff import diff_reports
-from tideline.report import to_json, to_markdown, to_mermaid, to_sarif, to_text
-from tideline.scanner import classify_server, scan
-from tideline.scoring import score_all
+from scopewake import scanner
+from scopewake.cli import main
+from scopewake.diff import diff_reports
+from scopewake.report import to_json, to_markdown, to_mermaid, to_sarif, to_text
+from scopewake.scanner import classify_server, scan
+from scopewake.scoring import score_all
 
 T = "ghp_" + "Q" * 36
 ALL = (to_json, to_text, to_markdown, to_mermaid, to_sarif)
@@ -70,8 +70,8 @@ class ReAudit(unittest.TestCase):
     # --- N02: diff outputs and errors
     def test_n02_diff_and_errors_do_not_echo_secrets(self):
         old, new = self.t / "old.json", self.t / "new.json"
-        write(old, {"tool": "tideline", "agents": []})
-        write(new, {"tool": "tideline", "agents": [{"kind": "cursor", "name": T, "score": 1}]})
+        write(old, {"tool": "scopewake", "agents": []})
+        write(new, {"tool": "scopewake", "agents": [{"kind": "cursor", "name": T, "score": 1}]})
         for fmt in ("text", "json"):
             rc, out, err = self.cli("diff", str(old), str(new), "--format", fmt)
             self.assertNotIn(T, out + err)
@@ -134,14 +134,14 @@ class ReAudit(unittest.TestCase):
 
     # --- N07: strict report validation
     def test_n07_malformed_reports_exit_2(self):
-        good = {"tool": "tideline", "agents": [{"kind": "cursor", "name": "Cursor", "score": 1}]}
+        good = {"tool": "scopewake", "agents": [{"kind": "cursor", "name": "Cursor", "score": 1}]}
         bads = [
-            {"tool": "tideline", "agents": [{"kind": "cursor", "name": "C", "score": None}]},
-            {"tool": "tideline", "agents": [{"kind": "cursor", "name": "C", "score": 1, "credentials": [{"kind": "k", "name": []}]}]},
-            {"tool": "tideline", "agents": [{"kind": "cursor", "name": "C", "score": 1, "capabilities": [{"name": 5}]}]},
-            {"tool": "tideline", "agents": [{"kind": "cursor", "name": "C", "score": 101}]},
-            {"tool": "tideline", "agents": [{"kind": "cursor", "name": "C", "score": 1, "trifecta": "yes"}]},
-            {"tool": "tideline", "agents": [{"kind": 3, "name": "C", "score": 1}]},
+            {"tool": "scopewake", "agents": [{"kind": "cursor", "name": "C", "score": None}]},
+            {"tool": "scopewake", "agents": [{"kind": "cursor", "name": "C", "score": 1, "credentials": [{"kind": "k", "name": []}]}]},
+            {"tool": "scopewake", "agents": [{"kind": "cursor", "name": "C", "score": 1, "capabilities": [{"name": 5}]}]},
+            {"tool": "scopewake", "agents": [{"kind": "cursor", "name": "C", "score": 101}]},
+            {"tool": "scopewake", "agents": [{"kind": "cursor", "name": "C", "score": 1, "trifecta": "yes"}]},
+            {"tool": "scopewake", "agents": [{"kind": 3, "name": "C", "score": 1}]},
         ]
         g = self.t / "g.json"
         write(g, good)
@@ -150,7 +150,7 @@ class ReAudit(unittest.TestCase):
             write(f, b)
             self.assertEqual(self.cli("diff", str(g), str(f))[0], 2, i)
         nan = self.t / "nan.json"
-        nan.write_text('{"tool":"tideline","agents":[{"kind":"cursor","name":"C","score":NaN}]}')
+        nan.write_text('{"tool":"scopewake","agents":[{"kind":"cursor","name":"C","score":NaN}]}')
         self.assertEqual(self.cli("diff", str(g), str(nan))[0], 2)
 
     # --- N08: identity independent of checkout path and agent order
@@ -165,10 +165,10 @@ class ReAudit(unittest.TestCase):
         self.assertFalse(diff_reports(str(fa), str(fb))["worse"])
 
     def test_n08_agent_order_does_not_matter(self):
-        doc = {"tool": "tideline", "agents": [
+        doc = {"tool": "scopewake", "agents": [
             {"kind": "cursor", "name": "C", "source_rel": "a", "score": 5, "capabilities": [{"name": "x", "via": "1"}]},
             {"kind": "cursor", "name": "C", "source_rel": "b", "score": 5, "capabilities": [{"name": "y", "via": "2"}]}]}
-        rev = {"tool": "tideline", "agents": list(reversed(doc["agents"]))}
+        rev = {"tool": "scopewake", "agents": list(reversed(doc["agents"]))}
         f1, f2 = self.t / "1.json", self.t / "2.json"
         write(f1, doc)
         write(f2, rev)
