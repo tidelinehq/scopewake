@@ -326,3 +326,6 @@ details[open] > summary .plus::after, .tile.open .plus::after { transform: rotat
   .live-count { font-weight: 500; color: #D9E4E9; }
 }
 @media (max-width: 720px) { .ask-row .btn, .ask-row > * { width: 100%; } }
+.step > * { min-width: 0; }
+.mini { width: 100%; max-width: 320px; }
+@media (max-width: 720px) { .step { padding: 24px 18px !important; gap: 20px; } .how { overflow-x: clip; } }
