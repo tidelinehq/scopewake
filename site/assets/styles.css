@@ -329,3 +329,23 @@ details[open] > summary .plus::after, .tile.open .plus::after { transform: rotat
 .step > * { min-width: 0; }
 .mini { width: 100%; max-width: 320px; }
 @media (max-width: 720px) { .step { padding: 24px 18px !important; gap: 20px; } .how { overflow-x: clip; } }
+
+/* In plain English: the first section any visitor can follow */
+.plain { padding: var(--gap) var(--m); background: var(--white); display: grid; gap: clamp(40px, 5vw, 72px); }
+.plain-head { display: grid; gap: 20px; max-width: 980px; }
+.eyebrow { font-size: var(--t-small); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); }
+.plain-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3vw, 40px); padding: 0; margin: 0; list-style: none; }
+.plain-step { display: grid; gap: 12px; align-content: start; padding: 28px; background: var(--canvas); border-top: 4px solid var(--teal); min-width: 0; }
+.plain-n { font-family: "Inter Display", sans-serif; font-weight: 700; font-size: 15px; width: 32px; height: 32px; display: grid; place-items: center; background: var(--ink); color: var(--white); border-radius: 50%; }
+.plain-t { font-family: "Inter Display", sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.02em; }
+.plain-step p { color: var(--muted); }
+.plain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(24px, 4vw, 64px); }
+.plain-sub { font-family: "Inter Display", sans-serif; font-weight: 600; font-size: 22px; margin-bottom: 16px; }
+.plain-who dl, .plain-terms dl { margin: 0; display: grid; gap: 16px; }
+.plain-who dt, .plain-terms dt { font-weight: 600; }
+.plain-who dd, .plain-terms dd { margin: 4px 0 0; color: var(--muted); font-size: var(--t-small); line-height: 1.5; }
+.plain-terms { padding: 24px; background: var(--mint); min-width: 0; }
+.plain-who { min-width: 0; }
+.plain-next a { font-weight: 600; color: var(--teal); text-decoration: none; border-bottom: 2px solid currentColor; }
+@media (max-width: 1080px) { .plain-steps, .plain-grid { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .plain-step { padding: 22px 18px; } }
