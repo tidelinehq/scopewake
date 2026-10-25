@@ -108,6 +108,23 @@ scopewake compliance --inventory ai-inventory.json --framework mas-airm --framew
 
 The pack lists every agent with the tools and systems it can reach and the guardrails found, joins your inventory (MAS paragraph 4.7 attributes), and marks each control evidenced, partial, gap or not covered. Declare AI inside SaaS products in the inventory: a local scan cannot see it. Indicative mapping, not legal advice.
 
+## Vendor AI: AI inside the SaaS you already use, plus shadow AI
+
+```
+scopewake vendors --apps okta-apps.csv --domains proxy-domains.csv --extensions extensions.csv --material material-providers.txt
+```
+
+- `--apps`: the app list exported from Okta or Microsoft Entra (CSV, or JSON including Graph `{"value": [...]}`).
+- `--domains`: a DNS or proxy log summary, one domain per line or CSV with an optional count column. Finds shadow AI.
+- `--extensions`: a browser-extension inventory from MDM or endpoint tooling. Finds shadow AI.
+- `--material`: your own list of material third-party service providers. Proposals from those providers rank first.
+
+Each match is a proposal. Your designated control function decides: `--decide <id> --decision accept|reject --by "<name>" [--reason ...]` prints the updated decisions log, which you then pass back in with `--decisions`. Output formats are text, md, json and csv.
+
+The report states what it did not cover. If no domain or extension list is supplied, it says shadow AI was not assessed. Apps missing from the catalogue are listed for manual review, because absence from the catalogue does not mean an app has no AI features. Catalogue facts come from vendor documentation with a source and a check date; anything not checked is marked "unverified". See docs/vendor-catalogue.md.
+
+Maps to MAS AIRM paras 4.2 (fn 21), 4.3 and 4.4. Indicative mapping, not legal advice.
+
 ## Approval review: keep AI approvals current
 
 An approval says "this agent may read invoices". A month later its connector gains payment access, and the approval is stale without anyone noticing. MAS Guidelines on AI Risk Management para 5.25(a): significant changes should trigger review and re-approval before implementation.

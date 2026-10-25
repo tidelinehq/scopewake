@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased (0.4.0)
+
+- `scopewake vendors`: finds AI features inside the SaaS an institution already uses (MAS AIRM para 4.2 and fn 21) and shadow AI (para 4.4). Inputs are files the institution exports: an Okta or Microsoft Entra app list, a DNS/proxy domain summary and a browser-extension inventory. All matching is offline.
+- Matches are proposals only. The designated control function accepts or rejects each one (`--decide ID --decision accept|reject --by NAME`), and every decision is logged with the decider, the date and the catalogue version (para 4.3).
+- The institution can supply its own material-provider list (`--material`); proposals from those providers rank first. Scopewake does not decide materiality.
+- Every report lists its coverage gaps: shadow AI not assessed, no materiality list, apps missing from the catalogue, unverified facts, and stale entries (older than 45 days).
+- Bundled vendor catalogue v0 (2026.10.26): 82 products. Every filled fact cites vendor documentation and a check date; everything else is marked "unverified". `scopewake catalogue-diff old new` produces the monthly change log.
+
 ## 0.3.0
 
 - Renamed from Tideline to Scopewake: package `scopewake`, command `scopewake`, repository `tidelinehq/scopewake`, website https://scopewake.com. JSON reports now say `"tool": "scopewake"`.

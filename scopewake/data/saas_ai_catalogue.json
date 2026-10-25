@@ -1,0 +1,2582 @@
+{
+ "kind": "scopewake-saas-ai-catalogue",
+ "version": "2026.10.26-v0",
+ "checked_on": "2026-10-26",
+ "rules": "Facts come from vendor documentation (source + date). Anything not checked is 'unverified'. Absence from the catalogue does not mean an app has no AI features.",
+ "products": [
+  {
+   "id": "microsoft-365-copilot",
+   "product": "Microsoft 365 Copilot",
+   "vendor": "Microsoft",
+   "category": "productivity suite",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Microsoft Corporation",
+    "MSFT"
+   ],
+   "idp_names": [
+    "Microsoft 365",
+    "Office 365",
+    "Microsoft Teams",
+    "SharePoint Online",
+    "Exchange Online",
+    "Microsoft Copilot"
+   ],
+   "domains": [
+    "copilot.microsoft.com",
+    "m365.cloud.microsoft",
+    "copilot.cloud.microsoft"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Microsoft 365 Copilot (Word, Excel, Outlook, Teams, SharePoint)",
+     "default_on": "unverified",
+     "customer_data_training": false,
+     "model_providers": [
+      "OpenAI (Azure OpenAI)",
+      "Anthropic"
+     ],
+     "admin_can_disable": true,
+     "sources": [
+      "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
+     ],
+     "notes": "Vendor: prompts, responses and Microsoft Graph data aren't used to train foundation LLMs; admins choose whether Anthropic models power experiences and which agents are allowed.",
+     "checked": "2026-10-26"
+    },
+    {
+     "name": "Microsoft 365 Copilot Chat (web grounded, enterprise data protection)",
+     "default_on": "unverified",
+     "customer_data_training": false,
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://learn.microsoft.com/en-us/copilot/privacy-and-protections"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "microsoft-dynamics-365",
+   "product": "Dynamics 365",
+   "vendor": "Microsoft",
+   "category": "CRM / ERP",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Microsoft Corporation"
+   ],
+   "idp_names": [
+    "Dynamics 365",
+    "Dynamics CRM",
+    "Microsoft Dynamics"
+   ],
+   "domains": [
+    "dynamics.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Copilot in Dynamics 365",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "microsoft-power-platform",
+   "product": "Power Platform",
+   "vendor": "Microsoft",
+   "category": "low-code",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Microsoft Corporation"
+   ],
+   "idp_names": [
+    "Power Apps",
+    "Power Automate",
+    "Copilot Studio",
+    "Power Platform"
+   ],
+   "domains": [
+    "powerapps.com",
+    "powerautomate.com",
+    "copilotstudio.microsoft.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Copilot Studio agents",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    },
+    {
+     "name": "Copilot in Power Apps / Power Automate",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "microsoft-power-bi",
+   "product": "Power BI / Microsoft Fabric",
+   "vendor": "Microsoft",
+   "category": "analytics",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Microsoft Corporation"
+   ],
+   "idp_names": [
+    "Power BI",
+    "Microsoft Fabric"
+   ],
+   "domains": [
+    "powerbi.com",
+    "fabric.microsoft.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Copilot in Power BI and Fabric",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "google-workspace",
+   "product": "Google Workspace",
+   "vendor": "Google",
+   "category": "productivity suite",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Google LLC",
+    "Alphabet"
+   ],
+   "idp_names": [
+    "Google Workspace",
+    "G Suite",
+    "Gmail",
+    "Google Drive"
+   ],
+   "domains": [
+    "workspace.google.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Gemini in Workspace (Gmail, Docs, Sheets, Meet) and the Gemini app",
+     "default_on": "yes: the Gemini app is a core service turned on by default",
+     "customer_data_training": false,
+     "model_providers": [
+      "Google (Gemini)"
+     ],
+     "admin_can_disable": true,
+     "sources": [
+      "https://knowledge.workspace.google.com/admin/generative-ai/generative-ai-in-google-workspace-privacy-hub"
+     ],
+     "notes": "Vendor: content not used for generative-model training outside your domain without permission.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "zoom",
+   "product": "Zoom Workplace",
+   "vendor": "Zoom",
+   "category": "meetings",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Zoom Video Communications",
+    "Zoom Communications"
+   ],
+   "idp_names": [
+    "Zoom",
+    "Zoom Workplace",
+    "Zoom Video Communications"
+   ],
+   "domains": [
+    "zoom.us",
+    "zoom.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Zoom AI Companion (summaries, meeting questions, smart recordings)",
+     "default_on": "unverified",
+     "customer_data_training": false,
+     "model_providers": "unverified",
+     "admin_can_disable": true,
+     "sources": [
+      "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0057623"
+     ],
+     "notes": "Vendor: audio, video, chat, screen sharing and attachments are not used to train Zoom's or third-party models; admins can enable or disable AI features for the account or groups.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "webex",
+   "product": "Webex",
+   "vendor": "Cisco",
+   "category": "meetings",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Cisco Systems"
+   ],
+   "idp_names": [
+    "Webex",
+    "Cisco Webex"
+   ],
+   "domains": [
+    "webex.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Cisco AI Assistant for Webex",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "yes: user access to AI Assistant and AI features is managed in Control Hub",
+     "sources": [
+      "https://help.webex.com/en-us/article/9dofjcb/Customize-Cisco-AI-Assistant-and-AI-features-in-Control-Hub"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "slack",
+   "product": "Slack",
+   "vendor": "Salesforce",
+   "category": "messaging",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Slack Technologies",
+    "Salesforce"
+   ],
+   "idp_names": [
+    "Slack"
+   ],
+   "domains": [
+    "slack.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Slack AI (summaries, search answers, recaps)",
+     "default_on": "unverified",
+     "customer_data_training": "no, unless the customer gives affirmative opt-in consent",
+     "model_providers": "third-party LLMs hosted in Slack's cloud provider (e.g. AWS) infrastructure",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://slack.com/trust/data-management/privacy-principles"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    },
+    {
+     "name": "Slack global ML models (search ranking, suggestions; not generative)",
+     "default_on": "unverified",
+     "customer_data_training": "yes, unless the customer opts out",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://slack.com/trust/data-management/privacy-principles"
+     ],
+     "notes": "Vendor offers an opt-out to exclude customer data from training Slack global models.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "atlassian",
+   "product": "Jira / Confluence (Atlassian Cloud)",
+   "vendor": "Atlassian",
+   "category": "work management",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Atlassian Corporation"
+   ],
+   "idp_names": [
+    "Jira",
+    "Confluence",
+    "Atlassian",
+    "Jira Service Management",
+    "Trello",
+    "Loom",
+    "Bitbucket"
+   ],
+   "domains": [
+    "atlassian.net",
+    "atlassian.com",
+    "loom.com",
+    "trello.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Rovo and Atlassian AI features",
+     "default_on": "yes for Rovo Search, Studio and Bookmarks (always on, part of the platform)",
+     "customer_data_training": "customer metadata may be used to fine-tune open-source models run within Atlassian's infrastructure",
+     "model_providers": [
+      "OpenAI",
+      "Anthropic",
+      "Google"
+     ],
+     "admin_can_disable": "partly: admins can activate or deactivate AI-powered Rovo features; Search, Studio and Bookmarks are always on",
+     "sources": [
+      "https://www.atlassian.com/trust/ai"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "notion",
+   "product": "Notion",
+   "vendor": "Notion Labs",
+   "category": "docs / wiki",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Notion"
+   ],
+   "domains": [
+    "notion.so",
+    "notion.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Notion AI",
+     "default_on": "unverified",
+     "customer_data_training": "no, by default",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://www.notion.com/help/notion-ai-security-practices"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "miro",
+   "product": "Miro",
+   "vendor": "Miro",
+   "category": "whiteboard",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Miro"
+   ],
+   "domains": [
+    "miro.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Miro AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "box",
+   "product": "Box",
+   "vendor": "Box",
+   "category": "content management",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Box"
+   ],
+   "domains": [
+    "box.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Box AI",
+     "default_on": "unverified",
+     "customer_data_training": "no, not without the customer's explicit approval",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://www.box.com/ai/trust"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "dropbox",
+   "product": "Dropbox",
+   "vendor": "Dropbox",
+   "category": "content management",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Dropbox"
+   ],
+   "domains": [
+    "dropbox.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Dropbox Dash / Dropbox AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "adobe-acrobat",
+   "product": "Adobe Acrobat / Document Cloud",
+   "vendor": "Adobe",
+   "category": "documents",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Adobe Inc"
+   ],
+   "idp_names": [
+    "Adobe Acrobat",
+    "Adobe Document Cloud",
+    "Adobe Creative Cloud",
+    "Adobe"
+   ],
+   "domains": [
+    "acrobat.adobe.com",
+    "documentcloud.adobe.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Acrobat AI Assistant",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "adobe-firefly",
+   "product": "Adobe Firefly / Express",
+   "vendor": "Adobe",
+   "category": "creative",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Adobe Inc"
+   ],
+   "idp_names": [
+    "Adobe Express",
+    "Adobe Firefly"
+   ],
+   "domains": [
+    "firefly.adobe.com",
+    "express.adobe.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Firefly generative features",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "docusign",
+   "product": "Docusign",
+   "vendor": "Docusign",
+   "category": "e-signature / agreements",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "DocuSign",
+    "Docusign"
+   ],
+   "domains": [
+    "docusign.com",
+    "docusign.net"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Docusign IAM AI (agreement analysis)",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "canva",
+   "product": "Canva",
+   "vendor": "Canva",
+   "category": "design",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Canva"
+   ],
+   "domains": [
+    "canva.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Canva Magic Studio",
+     "default_on": "unverified",
+     "customer_data_training": "controlled by privacy settings; data may be used to improve AI services",
+     "model_providers": "unnamed 'Technology Partners'",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://www.canva.com/policies/ai-product-terms/"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "figma",
+   "product": "Figma",
+   "vendor": "Figma",
+   "category": "design",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Figma"
+   ],
+   "domains": [
+    "figma.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Figma AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "asana",
+   "product": "Asana",
+   "vendor": "Asana",
+   "category": "work management",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Asana"
+   ],
+   "domains": [
+    "asana.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Asana AI / AI Studio",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "monday",
+   "product": "monday.com",
+   "vendor": "monday.com",
+   "category": "work management",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "monday.com"
+   ],
+   "domains": [
+    "monday.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "monday AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "smartsheet",
+   "product": "Smartsheet",
+   "vendor": "Smartsheet",
+   "category": "work management",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Smartsheet"
+   ],
+   "domains": [
+    "smartsheet.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Smartsheet AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "airtable",
+   "product": "Airtable",
+   "vendor": "Airtable",
+   "category": "work management",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Airtable"
+   ],
+   "domains": [
+    "airtable.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Airtable AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "salesforce",
+   "product": "Salesforce",
+   "vendor": "Salesforce",
+   "category": "CRM",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "salesforce.com inc"
+   ],
+   "idp_names": [
+    "Salesforce",
+    "Sales Cloud",
+    "Service Cloud",
+    "Financial Services Cloud",
+    "Marketing Cloud",
+    "Tableau CRM"
+   ],
+   "domains": [
+    "salesforce.com",
+    "force.com",
+    "my.salesforce.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Agentforce / Einstein generative AI",
+     "default_on": "unverified",
+     "customer_data_training": false,
+     "model_providers": [
+      "OpenAI"
+     ],
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://help.salesforce.com/s/articleView?id=ai.generative_ai_trust_layer.htm&type=5"
+     ],
+     "notes": "Vendor (Einstein Trust Layer): data isn't retained by third-party LLMs and isn't used for their training; OpenAI is the provider named on the page.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "servicenow",
+   "product": "ServiceNow",
+   "vendor": "ServiceNow",
+   "category": "IT service management",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "ServiceNow"
+   ],
+   "domains": [
+    "service-now.com",
+    "servicenow.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Now Assist",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "Data-sharing for model improvement has an opt-out in Now Assist Admin > Settings > Data sharing (per a ServiceNow community answer, not yet confirmed in product docs).",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "workday",
+   "product": "Workday",
+   "vendor": "Workday",
+   "category": "HR / finance",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Workday"
+   ],
+   "domains": [
+    "workday.com",
+    "myworkday.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Workday AI and agents",
+     "default_on": "unverified",
+     "customer_data_training": "yes for contributed data categories; some features require opting in, and Universal MSA customers can opt out by support request",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://doc.workday.com/admin-guide/en-us/workday-ai/ai-data-contributions/manage-workday-ai-data-contributions-for-universal.html",
+      "https://doc.workday.com/admin-guide/en-us/workday-ai/ai-data-contributions/reference--machine-learning-data-contributions.html"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "sap-successfactors",
+   "product": "SAP SuccessFactors",
+   "vendor": "SAP",
+   "category": "HR",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "SAP SE"
+   ],
+   "idp_names": [
+    "SuccessFactors",
+    "SAP SuccessFactors"
+   ],
+   "domains": [
+    "successfactors.com",
+    "sapsf.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Joule copilot",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "sap-concur",
+   "product": "SAP Concur",
+   "vendor": "SAP",
+   "category": "expenses",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "SAP SE"
+   ],
+   "idp_names": [
+    "Concur",
+    "SAP Concur"
+   ],
+   "domains": [
+    "concursolutions.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Concur AI features / Joule",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "sap-ariba",
+   "product": "SAP Ariba",
+   "vendor": "SAP",
+   "category": "procurement",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "SAP SE"
+   ],
+   "idp_names": [
+    "Ariba",
+    "SAP Ariba"
+   ],
+   "domains": [
+    "ariba.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Joule in Ariba",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "oracle-fusion",
+   "product": "Oracle Fusion Cloud Applications",
+   "vendor": "Oracle",
+   "category": "ERP / HCM",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Oracle Corporation"
+   ],
+   "idp_names": [
+    "Oracle Fusion",
+    "Oracle Cloud",
+    "Oracle HCM",
+    "Oracle ERP"
+   ],
+   "domains": [
+    "oraclecloud.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "AI agents in Fusion Applications",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "coupa",
+   "product": "Coupa",
+   "vendor": "Coupa",
+   "category": "procurement",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Coupa"
+   ],
+   "domains": [
+    "coupahost.com",
+    "coupa.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Coupa Navi / AI agents",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "zendesk",
+   "product": "Zendesk",
+   "vendor": "Zendesk",
+   "category": "customer service",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Zendesk"
+   ],
+   "domains": [
+    "zendesk.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Zendesk AI agents and copilot",
+     "default_on": "unverified",
+     "customer_data_training": "no for generative AI (pre-trained models; third parties don't train on inputs); proprietary classification models may be trained on customer data as the customer instructs",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://support.zendesk.com/hc/en-us/articles/5729714731290-Zendesk-AI-Data-Use-Information",
+      "https://support.zendesk.com/hc/en-us/articles/9196781863578-AI-Trust-at-Zendesk"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "freshworks",
+   "product": "Freshworks (Freshdesk, Freshservice)",
+   "vendor": "Freshworks",
+   "category": "customer / IT service",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Freshdesk",
+    "Freshservice",
+    "Freshworks"
+   ],
+   "domains": [
+    "freshdesk.com",
+    "freshservice.com",
+    "freshworks.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Freddy AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "hubspot",
+   "product": "HubSpot",
+   "vendor": "HubSpot",
+   "category": "CRM / marketing",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "HubSpot"
+   ],
+   "domains": [
+    "hubspot.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Breeze AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "intercom",
+   "product": "Intercom",
+   "vendor": "Intercom",
+   "category": "customer service",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Intercom"
+   ],
+   "domains": [
+    "intercom.com",
+    "intercom.io"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Fin AI agent",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "genesys",
+   "product": "Genesys Cloud",
+   "vendor": "Genesys",
+   "category": "contact centre",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Genesys Cloud",
+    "Genesys",
+    "PureCloud"
+   ],
+   "domains": [
+    "mypurecloud.com",
+    "genesys.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Genesys AI (copilot, virtual agents)",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "nice-cxone",
+   "product": "NICE CXone",
+   "vendor": "NICE",
+   "category": "contact centre",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "NICE CXone",
+    "inContact"
+   ],
+   "domains": [
+    "niceincontact.com",
+    "nicecxone.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Enlighten AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "gong",
+   "product": "Gong",
+   "vendor": "Gong",
+   "category": "revenue intelligence",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Gong"
+   ],
+   "domains": [
+    "gong.io"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Gong AI (call recording and analysis)",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "linkedin",
+   "product": "LinkedIn Recruiter / Sales Navigator",
+   "vendor": "Microsoft",
+   "category": "recruiting / sales",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "LinkedIn Corporation",
+    "Microsoft Corporation"
+   ],
+   "idp_names": [
+    "LinkedIn Recruiter",
+    "LinkedIn Sales Navigator",
+    "LinkedIn Learning"
+   ],
+   "domains": [],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "AI-assisted messaging and search",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "workiva",
+   "product": "Workiva",
+   "vendor": "Workiva",
+   "category": "reporting",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Workiva"
+   ],
+   "domains": [
+    "workiva.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Workiva AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "uipath",
+   "product": "UiPath",
+   "vendor": "UiPath",
+   "category": "automation",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "UiPath",
+    "UiPath Automation Cloud"
+   ],
+   "domains": [
+    "uipath.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "UiPath Autopilot / agents",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "pega",
+   "product": "Pega",
+   "vendor": "Pegasystems",
+   "category": "process automation",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Pega",
+    "Pega Cloud"
+   ],
+   "domains": [
+    "pega.com",
+    "pegacloud.net"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Pega GenAI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "appian",
+   "product": "Appian",
+   "vendor": "Appian",
+   "category": "process automation",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Appian"
+   ],
+   "domains": [
+    "appiancloud.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Appian AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "ncino",
+   "product": "nCino",
+   "vendor": "nCino",
+   "category": "banking platform",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "nCino"
+   ],
+   "domains": [
+    "ncino.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "nCino Banking Advisor",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "temenos",
+   "product": "Temenos (SaaS)",
+   "vendor": "Temenos",
+   "category": "core banking",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Temenos"
+   ],
+   "domains": [
+    "temenos.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Temenos generative AI features",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "lseg-workspace",
+   "product": "LSEG Workspace",
+   "vendor": "London Stock Exchange Group",
+   "category": "market data",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "LSEG",
+    "Refinitiv"
+   ],
+   "idp_names": [
+    "LSEG Workspace",
+    "Refinitiv",
+    "Eikon"
+   ],
+   "domains": [
+    "refinitiv.com",
+    "lseg.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "AI features in Workspace",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "bloomberg",
+   "product": "Bloomberg Terminal",
+   "vendor": "Bloomberg",
+   "category": "market data",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Bloomberg L.P."
+   ],
+   "idp_names": [
+    "Bloomberg"
+   ],
+   "domains": [],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Bloomberg AI document insights",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "github-copilot",
+   "product": "GitHub Copilot",
+   "vendor": "GitHub (Microsoft)",
+   "category": "developer",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "GitHub Inc",
+    "Microsoft Corporation"
+   ],
+   "idp_names": [
+    "GitHub",
+    "GitHub Enterprise",
+    "GitHub Copilot"
+   ],
+   "domains": [
+    "github.com",
+    "githubcopilot.com"
+   ],
+   "extension_names": [
+    "GitHub Copilot"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "GitHub Copilot Business / Enterprise",
+     "default_on": "unverified",
+     "customer_data_training": false,
+     "model_providers": [
+      "Anthropic",
+      "Google"
+     ],
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://copilot.github.trust.page/faq"
+     ],
+     "notes": "Vendor trust centre: Business/Enterprise data isn't used to train models; other model providers may be selectable and are not listed here until checked.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "snowflake",
+   "product": "Snowflake",
+   "vendor": "Snowflake",
+   "category": "data platform",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Snowflake"
+   ],
+   "domains": [
+    "snowflakecomputing.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Snowflake Cortex AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "databricks",
+   "product": "Databricks",
+   "vendor": "Databricks",
+   "category": "data platform",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Databricks"
+   ],
+   "domains": [
+    "databricks.com",
+    "cloud.databricks.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Databricks Assistant / Mosaic AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "tableau",
+   "product": "Tableau Cloud",
+   "vendor": "Salesforce",
+   "category": "analytics",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Salesforce"
+   ],
+   "idp_names": [
+    "Tableau",
+    "Tableau Cloud"
+   ],
+   "domains": [
+    "online.tableau.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Tableau Agent / Pulse",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "datadog",
+   "product": "Datadog",
+   "vendor": "Datadog",
+   "category": "observability",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Datadog"
+   ],
+   "domains": [
+    "datadoghq.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Bits AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "splunk",
+   "product": "Splunk Cloud",
+   "vendor": "Cisco",
+   "category": "observability / SIEM",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Splunk Inc",
+    "Cisco Systems"
+   ],
+   "idp_names": [
+    "Splunk"
+   ],
+   "domains": [
+    "splunkcloud.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Splunk AI Assistant",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "crowdstrike",
+   "product": "CrowdStrike Falcon",
+   "vendor": "CrowdStrike",
+   "category": "security",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "CrowdStrike",
+    "Falcon"
+   ],
+   "domains": [
+    "crowdstrike.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Charlotte AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "microsoft-security-copilot",
+   "product": "Microsoft Security Copilot",
+   "vendor": "Microsoft",
+   "category": "security",
+   "shadow_ai": false,
+   "vendor_aliases": [
+    "Microsoft Corporation"
+   ],
+   "idp_names": [
+    "Security Copilot",
+    "Microsoft Defender",
+    "Microsoft Sentinel"
+   ],
+   "domains": [
+    "securitycopilot.microsoft.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Security Copilot",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "palo-alto-cortex",
+   "product": "Palo Alto Networks Cortex / Prisma",
+   "vendor": "Palo Alto Networks",
+   "category": "security",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Cortex XSIAM",
+    "Cortex XDR",
+    "Prisma Cloud",
+    "Prisma Access"
+   ],
+   "domains": [
+    "paloaltonetworks.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Cortex AI features / Prisma AIRS",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "okta",
+   "product": "Okta",
+   "vendor": "Okta",
+   "category": "identity",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Okta Admin Console"
+   ],
+   "domains": [],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Okta AI features",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "zscaler",
+   "product": "Zscaler",
+   "vendor": "Zscaler",
+   "category": "network security",
+   "shadow_ai": false,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Zscaler",
+    "ZIA",
+    "ZPA"
+   ],
+   "domains": [
+    "zscaler.net",
+    "zscaler.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Zscaler AI features",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "cursor",
+   "product": "Cursor",
+   "vendor": "Anysphere",
+   "category": "developer",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Cursor"
+   ],
+   "domains": [
+    "cursor.com",
+    "cursor.sh"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Cursor AI editor and agents",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "chatgpt",
+   "product": "ChatGPT",
+   "vendor": "OpenAI",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [
+    "OpenAI LLC",
+    "OpenAI OpCo"
+   ],
+   "idp_names": [
+    "ChatGPT",
+    "ChatGPT Enterprise",
+    "OpenAI"
+   ],
+   "domains": [
+    "chatgpt.com",
+    "chat.openai.com",
+    "openai.com"
+   ],
+   "extension_names": [
+    "ChatGPT"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "ChatGPT Business / Enterprise",
+     "default_on": "unverified",
+     "customer_data_training": "no, not by default",
+     "model_providers": [
+      "OpenAI"
+     ],
+     "admin_can_disable": "admin feature and access controls available",
+     "sources": [
+      "https://openai.com/enterprise-privacy/"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    },
+    {
+     "name": "ChatGPT Free / Plus (personal accounts)",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "Training defaults for personal accounts not yet checked against vendor docs.",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "claude",
+   "product": "Claude",
+   "vendor": "Anthropic",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [
+    "Anthropic PBC"
+   ],
+   "idp_names": [
+    "Claude",
+    "Anthropic"
+   ],
+   "domains": [
+    "claude.ai",
+    "anthropic.com",
+    "claude.com"
+   ],
+   "extension_names": [
+    "Claude"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Claude for Work (Team / Enterprise) and API",
+     "default_on": "unverified",
+     "customer_data_training": "no, not by default",
+     "model_providers": [
+      "Anthropic"
+     ],
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    },
+    {
+     "name": "Claude Free / Pro / Max (personal accounts)",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "Training defaults for personal accounts not yet checked against vendor docs.",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "gemini-consumer",
+   "product": "Gemini (personal Google accounts)",
+   "vendor": "Google",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [
+    "Google LLC"
+   ],
+   "idp_names": [],
+   "domains": [
+    "gemini.google.com",
+    "bard.google.com",
+    "aistudio.google.com",
+    "notebooklm.google.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Gemini Apps",
+     "default_on": "unverified",
+     "customer_data_training": "yes, conversations may be used to improve models and reviewed by humans unless Keep Activity is off",
+     "model_providers": [
+      "Google (Gemini)"
+     ],
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://support.google.com/gemini/answer/13594961"
+     ],
+     "notes": "",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "copilot-consumer",
+   "product": "Microsoft Copilot (personal accounts)",
+   "vendor": "Microsoft",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [
+    "Microsoft Corporation"
+   ],
+   "idp_names": [],
+   "domains": [],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Copilot consumer app",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "perplexity",
+   "product": "Perplexity",
+   "vendor": "Perplexity AI",
+   "category": "AI search",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Perplexity",
+    "Perplexity Enterprise"
+   ],
+   "domains": [
+    "perplexity.ai"
+   ],
+   "extension_names": [
+    "Perplexity"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Perplexity consumer",
+     "default_on": "unverified",
+     "customer_data_training": "yes, prompts may be used to improve AI models",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://www.perplexity.ai/hub/legal/privacy-notice"
+     ],
+     "notes": "Vendor: this notice doesn't apply to Enterprise and API offerings, where Perplexity acts as a service provider.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "deepseek",
+   "product": "DeepSeek",
+   "vendor": "DeepSeek",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "deepseek.com",
+    "chat.deepseek.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "DeepSeek chat and app",
+     "default_on": "unverified",
+     "customer_data_training": "yes, with a user right to opt out",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html"
+     ],
+     "notes": "Vendor privacy policy: personal data is processed and stored in the People's Republic of China.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "grok",
+   "product": "Grok",
+   "vendor": "xAI",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "grok.com",
+    "x.ai"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Grok",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "mistral",
+   "product": "Le Chat",
+   "vendor": "Mistral AI",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "chat.mistral.ai",
+    "mistral.ai"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Le Chat",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "meta-ai",
+   "product": "Meta AI",
+   "vendor": "Meta",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "meta.ai"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Meta AI",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "poe",
+   "product": "Poe",
+   "vendor": "Quora",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "poe.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Poe multi-model chat",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "character-ai",
+   "product": "Character.AI",
+   "vendor": "Character Technologies",
+   "category": "AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "character.ai"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Character chat",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "midjourney",
+   "product": "Midjourney",
+   "vendor": "Midjourney",
+   "category": "image generation",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "midjourney.com"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Image generation",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "otter",
+   "product": "Otter.ai",
+   "vendor": "Otter.ai",
+   "category": "meeting notetaker",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Otter",
+    "Otter.ai"
+   ],
+   "domains": [
+    "otter.ai"
+   ],
+   "extension_names": [
+    "Otter.ai"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Otter AI notetaker",
+     "default_on": "unverified",
+     "customer_data_training": "yes, on de-identified recordings and transcripts",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://otter.ai/privacy-policy"
+     ],
+     "notes": "Vendor privacy policy: proprietary AI is trained on de-identified audio and transcriptions that may contain personal information.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "fireflies",
+   "product": "Fireflies.ai",
+   "vendor": "Fireflies.ai",
+   "category": "meeting notetaker",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [
+    "Fireflies"
+   ],
+   "domains": [
+    "fireflies.ai"
+   ],
+   "extension_names": [
+    "Fireflies"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Fireflies notetaker",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "read-ai",
+   "product": "Read AI",
+   "vendor": "Read AI",
+   "category": "meeting notetaker",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "read.ai"
+   ],
+   "extension_names": [
+    "Read AI"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Read AI notetaker",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "tldv",
+   "product": "tl;dv",
+   "vendor": "tl;dv",
+   "category": "meeting notetaker",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "tldv.io"
+   ],
+   "extension_names": [
+    "tl;dv"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "tl;dv notetaker",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "grammarly",
+   "product": "Grammarly",
+   "vendor": "Grammarly (Superhuman)",
+   "category": "writing assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [
+    "Grammarly Inc",
+    "Superhuman"
+   ],
+   "idp_names": [
+    "Grammarly",
+    "Grammarly Business"
+   ],
+   "domains": [
+    "grammarly.com",
+    "grammarly.io"
+   ],
+   "extension_names": [
+    "Grammarly"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Grammarly generative AI",
+     "default_on": "unverified",
+     "customer_data_training": "yes, unless 'Product Improvement and Training' is turned off",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [
+      "https://www.grammarly.com/trust"
+     ],
+     "notes": "Whether Business/Enterprise defaults differ is not yet checked.",
+     "checked": "2026-10-26"
+    }
+   ]
+  },
+  {
+   "id": "quillbot",
+   "product": "QuillBot",
+   "vendor": "Learneo",
+   "category": "writing assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "quillbot.com"
+   ],
+   "extension_names": [
+    "QuillBot"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Paraphraser and AI writing",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "deepl",
+   "product": "DeepL",
+   "vendor": "DeepL",
+   "category": "translation",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [
+    "DeepL",
+    "DeepL Pro"
+   ],
+   "domains": [
+    "deepl.com"
+   ],
+   "extension_names": [
+    "DeepL"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "DeepL Translator / Write",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "jasper",
+   "product": "Jasper",
+   "vendor": "Jasper AI",
+   "category": "writing assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "jasper.ai"
+   ],
+   "extension_names": [
+    "Jasper"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Jasper",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "monica",
+   "product": "Monica",
+   "vendor": "Monica",
+   "category": "browser AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "monica.im"
+   ],
+   "extension_names": [
+    "Monica"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Monica sidebar assistant",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "merlin",
+   "product": "Merlin",
+   "vendor": "Foyer",
+   "category": "browser AI assistant",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "getmerlin.in"
+   ],
+   "extension_names": [
+    "Merlin"
+   ],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Merlin sidebar assistant",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "huggingface",
+   "product": "Hugging Face",
+   "vendor": "Hugging Face",
+   "category": "AI models / chat",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "huggingface.co",
+    "hf.co"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "HuggingChat, hosted models",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  },
+  {
+   "id": "manus",
+   "product": "Manus",
+   "vendor": "Manus",
+   "category": "AI agent",
+   "shadow_ai": true,
+   "vendor_aliases": [],
+   "idp_names": [],
+   "domains": [
+    "manus.im"
+   ],
+   "extension_names": [],
+   "extension_ids": [],
+   "features": [
+    {
+     "name": "Manus agent",
+     "default_on": "unverified",
+     "customer_data_training": "unverified",
+     "model_providers": "unverified",
+     "admin_can_disable": "unverified",
+     "sources": [],
+     "notes": "",
+     "checked": ""
+    }
+   ]
+  }
+ ]
+}

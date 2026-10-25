@@ -33,3 +33,6 @@ scopewake = "scopewake.cli:main"
 
 [tool.setuptools]
 packages = ["scopewake"]
+
+[tool.setuptools.package-data]
+scopewake = ["data/*.json"]

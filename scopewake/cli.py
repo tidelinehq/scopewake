@@ -14,6 +14,7 @@ from . import compliance as comp
 from .fix import fixes
 from . import approvals as apv
 from .diff import normalize
+from . import vendors as vnd
 from datetime import date
 
 
@@ -74,7 +75,33 @@ def main(argv=None):
     d.add_argument("new")
     d.add_argument("--format", choices=["text", "json"], default="text")
     d.add_argument("--fail-on-increase", action="store_true", help="exit 1 if any agent's reach grew (for CI drift gates)")
+    v = sub.add_parser("vendors", help="find AI features inside the SaaS you use, plus shadow AI (MAS paras 4.2-4.4, fn 21); proposals only")
+    v.add_argument("--apps", metavar="FILE", help="app list exported from Okta or Microsoft Entra (CSV or JSON)")
+    v.add_argument("--domains", metavar="FILE", help="DNS or proxy log summary: domains, optionally with counts (shadow AI)")
+    v.add_argument("--extensions", metavar="FILE", help="browser-extension inventory from MDM/endpoint tooling (shadow AI)")
+    v.add_argument("--material", metavar="FILE", help="your list of material third-party service providers (ranks proposals)")
+    v.add_argument("--decisions", metavar="FILE", help="control-function decisions log (JSON) to apply")
+    v.add_argument("--catalogue", metavar="FILE", help="use this catalogue instead of the bundled one")
+    v.add_argument("--format", choices=["text", "md", "json", "csv"], default="text")
+    v.add_argument("--decide", metavar="PROPOSAL_ID", help="record a decision on a proposal and print the updated decisions log")
+    v.add_argument("--decision", choices=["accept", "reject"])
+    v.add_argument("--by", default="", help="who in the designated control function made the decision")
+    v.add_argument("--reason", default="")
+    v.add_argument("--today", metavar="YYYY-MM-DD", help=argparse.SUPPRESS)
+    vc = sub.add_parser("catalogue-diff", help="compare two vendor AI catalogue versions (monthly re-check log)")
+    vc.add_argument("old")
+    vc.add_argument("new")
     args = p.parse_args(argv)
+    if args.cmd == "vendors":
+        return _vendors(args)
+    if args.cmd == "catalogue-diff":
+        try:
+            res = vnd.catalogue_diff(vnd.load_catalogue(args.old), vnd.load_catalogue(args.new))
+        except (OSError, ValueError) as e:
+            print(f"scopewake catalogue-diff: {safe(e, 400)}", file=sys.stderr)
+            return 2
+        print(json.dumps(scrub_tree(res), indent=2))
+        return 0
     if args.cmd == "diff":
         try:
             res = diff_reports(args.old, args.new)
@@ -150,6 +177,38 @@ def _live(args):
         except (OSError, ValueError) as e:
             issues.append(f"AWS export not analysed: {e}")
     return score_all(agents), issues
+
+
+def _vendors(args):
+    name = "scopewake vendors"
+    try:
+        today = date.fromisoformat(args.today) if args.today else date.today()
+        cat = vnd.load_catalogue(args.catalogue)
+        apps = vnd.parse_apps(args.apps) if args.apps else []
+        doms = vnd.parse_domains(args.domains) if args.domains else []
+        exts = vnd.parse_extensions(args.extensions) if args.extensions else []
+        mat = vnd.parse_material(args.material) if args.material else []
+        if not (apps or doms or exts):
+            raise ValueError("supply at least one of --apps, --domains, --extensions")
+        log = vnd.load_decisions(args.decisions) if args.decisions else vnd.empty_decisions()
+        res = vnd.identify(cat, apps, doms, exts, mat, log, today)
+        if args.decide:
+            if not args.decision:
+                raise ValueError("--decide needs --decision accept|reject")
+            print(json.dumps(vnd.decide(log, res, args.decide, args.decision, args.by, today, args.reason), indent=2))
+            return 0
+    except (OSError, ValueError, RecursionError) as e:
+        print(f"{name}: {safe(e, 400)}", file=sys.stderr)
+        return 2
+    if args.format == "json":
+        print(json.dumps(res, indent=2))
+    elif args.format == "csv":
+        print(vnd.to_csv(res), end="")
+    else:
+        print(scrub(vnd.to_text(res, markdown=args.format == "md")))
+    if not res["coverage"]["shadow_ai_assessed"]:
+        print(f"{name}: shadow AI not assessed (no --domains or --extensions); see MAS AIRM para 4.4.", file=sys.stderr)
+    return 0
 
 
 def _approvals(args):
