@@ -15,6 +15,7 @@ from .fix import fixes
 from . import approvals as apv
 from .diff import normalize
 from . import vendors as vnd
+from . import inventory as invmod
 from datetime import date
 
 
@@ -64,6 +65,14 @@ def main(argv=None):
     rv.add_argument("--format", choices=["text", "md", "json", "csv"], default="text")
     rv.add_argument("--fail-on-review", action="store_true", help="exit 1 if any approval needs re-review or has expired, or an agent has none (for CI)")
     rv.add_argument("--refs", choices=list(apv.REFS), default="mas", help="regulatory references to print (default mas; 'none' for neutral output)")
+    im = sub.add_parser("import", help="turn an exported agent inventory (Defender XDR AgentsInfo, or any CSV/JSON) into a scopewake report")
+    im.add_argument("file")
+    im.add_argument("--source", choices=["defender", "generic"], default="defender")
+    im.add_argument("--map", action="append", default=[], metavar="FIELD=COLUMN",
+                    help="column for a field (" + ", ".join(invmod.GENERIC_FIELDS) + "); repeat; overrides the preset")
+    im.add_argument("--platform", default="", help="platform label to use when the export has none (e.g. agentforce)")
+    mg = sub.add_parser("merge", help="combine scan and import reports into one, for approve/review across every agent type")
+    mg.add_argument("reports", nargs="+")
     vl = sub.add_parser("verify-ledger", help="check the approvals ledger's integrity log for edits made after the fact")
     vl.add_argument("ledger")
     vl.add_argument("--format", choices=["text", "json"], default="text")
@@ -77,6 +86,8 @@ def main(argv=None):
     ev.add_argument("--framework", action="append", choices=list(comp.FRAMEWORKS) + ["all", "none"], default=None,
                     help="compliance mapping(s) to include; repeat; default mas-airm; 'none' to skip")
     ev.add_argument("--refs", choices=list(apv.REFS), default="mas", help="references printed in the approval review")
+    ev.add_argument("--include", action="append", default=[], metavar="REPORT",
+                    help="imported or saved report (from `scopewake import`) to include in the approval review; repeat")
     ev.add_argument("--format", choices=["json", "md"], default="json",
                     help="json: one bundle with every file and its SHA-256 (save with > pack.json); md: one readable document")
     cp = sub.choices["compliance"]
@@ -140,6 +151,30 @@ def main(argv=None):
         return 0
     if args.cmd in ("approve", "review"):
         return _approvals(args)
+    if args.cmd == "import":
+        try:
+            rep = invmod.import_inventory(args.file, args.source, invmod.parse_map(args.map), args.platform)
+        except (OSError, ValueError, RecursionError) as e:
+            print(f"scopewake import: {safe(e, 400)}", file=sys.stderr)
+            return 2
+        print(json.dumps(rep, indent=2))
+        print(f"scopewake import: {len(rep['agents'])} agent(s) imported", file=sys.stderr)
+        return 0
+    if args.cmd == "merge":
+        try:
+            reps = []
+            for f in args.reports:
+                p = Path(f)
+                if p.stat().st_size > 16 * 1024 * 1024:
+                    raise ValueError(f"{safe(f, 200)} is larger than 16 MB")
+                reps.append(json.loads(p.read_text(encoding="utf-8")))
+            out = invmod.merge_reports(reps)
+            normalize(json.loads(json.dumps(out)), "<merged>")  # validate before printing
+        except (OSError, ValueError, RecursionError) as e:
+            print(f"scopewake merge: {safe(e, 400)}", file=sys.stderr)
+            return 2
+        print(json.dumps(scrub_tree(out), indent=2))
+        return 0
     if args.cmd == "verify-ledger":
         try:
             res = apv.verify_ledger(apv.load_ledger(args.ledger))
@@ -283,7 +318,16 @@ def _evidence(args):
         return 2
     agents, issues = _live(args)
     files = {"scan.json": to_json(agents, issues), "scan.md": scrub(to_markdown(agents, issues))}
-    report = normalize(json.loads(files["scan.json"]), "<scan>")
+    try:
+        extra = [json.loads(Path(f).read_text(encoding="utf-8")) for f in args.include]
+        merged = invmod.merge_reports([json.loads(files["scan.json"])] + extra)
+        report = normalize(merged, "<scan+imports>")
+    except (OSError, ValueError, RecursionError) as e:
+        print(f"{name}: {safe(e, 400)}", file=sys.stderr)
+        return 2
+    if extra:
+        files["imported.json"] = json.dumps(scrub_tree({"inputs": [safe(f, 200) for f in args.include],
+                                                        "agents": [a for r in extra for a in r.get("agents", [])]}), indent=2)
     rev, ver = None, None
     if ledger is not None:
         rev = apv.review(ledger, report, date.today(), refs=args.refs)

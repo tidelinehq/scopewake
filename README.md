@@ -155,6 +155,25 @@ scopewake review --ledger approvals.json --refs none                    # neutra
 
 Every `approve` appends an event to the ledger's integrity log. Each event's hash covers the previous event and the full approval record, so an approval edited by hand, or an event removed, shows up in `verify-ledger` (exit 1). A hash chain cannot stop someone who rewrites the whole file and recomputes every hash: store the head hash outside the ledger (a ticket, an email) as an anchor. Ledgers from earlier versions start their log at the next `approve`, with existing approvals recorded as a baseline.
 
+### Every agent type: import the inventories you already have (0.4.0)
+
+`scan` finds coding agents on a machine. Copilot Studio, Agentforce and agents your teams build are usually already listed in another tool. Import that list instead of rescanning, then approve and review every agent in one ledger.
+
+```bash
+# Microsoft Defender XDR advanced hunting: run `AgentsInfo`, export the results (CSV or JSON)
+scopewake import agentsinfo.csv > platform-agents.json
+# Any other inventory (ServiceNow, Agentforce, a spreadsheet): map its columns
+scopewake import agents.csv --source generic --map name=Agent --map owner=Owner --map tools=Tools --platform agentforce > sf.json
+# One report across all sources; approve and review it as usual
+scopewake scan --format json > scan.json
+scopewake merge scan.json platform-agents.json sf.json > all.json
+scopewake approve --report all.json --ledger approvals.json --system "Invoice helper" --agent "Invoice helper" --by "Head of Risk" > approvals.new.json
+scopewake review --report all.json --ledger approvals.json
+scopewake evidence . --approvals approvals.json --include platform-agents.json > pack.json
+```
+
+Imported agents are not scored. Their reach is what the export declares: tools, data sources, permissions, MCP servers, connected agents, skills, channels and audience. Any addition, including a wider audience, makes the approval "re-review required". The `AgentsInfo` column names follow Microsoft's documentation; the inside of its JSON columns is not documented, so Scopewake reads names where it can and fingerprints every element, so a change still shows. System prompts (`Instructions`) are never copied. Deleted or uninstalled agents are dropped, and only the latest row per agent is kept.
+
 ## Fixes as managed settings
 
 ```bash

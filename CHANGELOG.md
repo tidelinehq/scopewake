@@ -2,6 +2,8 @@
 
 ## Unreleased (0.4.0)
 
+- `scopewake import`: turns an exported agent inventory into a Scopewake report, so approvals cover every agent type (Copilot Studio, Agentforce, in-house agents), not only coding agents found by `scan`. Preset for Microsoft Defender XDR `AgentsInfo` exports (CSV or JSON); `--source generic --map FIELD=COLUMN` for any other inventory. Reach = declared tools, data sources, permissions, MCP servers, connected agents, skills, channels and audience; elements are fingerprinted so undocumented changes still show. System prompts are never copied.
+- `scopewake merge`: one report from scan and imports; `approve --report` and `review --report` work across all of them. `scopewake evidence --include` adds imported agents to the review.
 - Approvals ledger integrity log: every `scopewake approve` appends a hash-chained event covering the full approval record. `scopewake verify-ledger FILE` reports intact, tampered (exit 1) or no integrity log, and prints the head hash to store elsewhere as an anchor. Older ledgers start the log on the next approval, with existing approvals recorded as a baseline.
 - `scopewake evidence`: one command bundles the scan, approval review, ledger verification and compliance mapping, each with a SHA-256, as JSON (default) or one Markdown document. Prints only; writes nothing.
 - `scopewake review --refs none`: neutral output without MAS paragraph references, for users outside MAS's scope. Default stays `mas`.
