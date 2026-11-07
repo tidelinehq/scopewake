@@ -144,6 +144,17 @@ scopewake review --ledger approvals.json --fail-on-review      # exit 1 if any a
 
 Each approval gets one status: **re-review required** (a covered agent gained a credential, capability, MCP server, cloud permission, a changed server endpoint or arguments, or a complete trifecta; any addition counts, whatever its severity), **evidence expired**, **verify** (an agent is missing or the scan was incomplete), **expiring soon** (30 days) or **current**. Agents in use with no approval are listed. Re-approving with `scopewake approve` keeps the earlier approval in the record's history. `scopewake compliance --approvals approvals.json` adds MAS paras 5.24-5.25 to the evidence pack. The owner decides whether a change is significant; Scopewake shows which approvals to look at.
 
+### Tamper-evident ledger and one-command evidence (0.4.0)
+
+```bash
+scopewake verify-ledger approvals.json      # intact / tampered / no integrity log; prints the head hash
+scopewake evidence . --approvals approvals.json > pack.json             # scan + review + ledger check + compliance, each with SHA-256
+scopewake evidence . --approvals approvals.json --format md > pack.md   # the same as one readable document
+scopewake review --ledger approvals.json --refs none                    # neutral output without MAS paragraph references
+```
+
+Every `approve` appends an event to the ledger's integrity log. Each event's hash covers the previous event and the full approval record, so an approval edited by hand, or an event removed, shows up in `verify-ledger` (exit 1). A hash chain cannot stop someone who rewrites the whole file and recomputes every hash: store the head hash outside the ledger (a ticket, an email) as an anchor. Ledgers from earlier versions start their log at the next `approve`, with existing approvals recorded as a baseline.
+
 ## Fixes as managed settings
 
 ```bash

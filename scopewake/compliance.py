@@ -202,7 +202,7 @@ def _check(kind: str, rows: List[dict], agents: List[Agent], inv: Optional[dict]
     if kind == "least_privilege":
         wide = [r for r in rows if r["source"] == "scan" and (r["score"] or 0) >= 70]
         if wide:
-            return "gap", f"{len(wide)} agent(s) reach high-impact credentials or capabilities (score >= 70): " + \
+            return "gap", f"{len(wide)} agent(s) reach high-impact credentials or capabilities (score 70 or above): " + \
                 ", ".join(safe(r["system"], 60) for r in wide) + ". See `scopewake fix`."
         return "evidenced", "No agent scores 70 or above."
     if kind == "oversight":

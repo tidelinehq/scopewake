@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scopewake"
-version = "0.3.0"
+version = "0.4.0"
 description = "See what each AI agent could reach, and keep AI approvals current when that reach changes. Local, read-only, offline."
 readme = "README.md"
 requires-python = ">=3.9"

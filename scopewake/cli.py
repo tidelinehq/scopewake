@@ -63,6 +63,22 @@ def main(argv=None):
     rv = sub.choices["review"]
     rv.add_argument("--format", choices=["text", "md", "json", "csv"], default="text")
     rv.add_argument("--fail-on-review", action="store_true", help="exit 1 if any approval needs re-review or has expired, or an agent has none (for CI)")
+    rv.add_argument("--refs", choices=list(apv.REFS), default="mas", help="regulatory references to print (default mas; 'none' for neutral output)")
+    vl = sub.add_parser("verify-ledger", help="check the approvals ledger's integrity log for edits made after the fact")
+    vl.add_argument("ledger")
+    vl.add_argument("--format", choices=["text", "json"], default="text")
+    ev = sub.add_parser("evidence", help="write a dated evidence pack (scan, approval review, compliance mapping) with a SHA-256 manifest")
+    ev.add_argument("path", nargs="?", default=".")
+    ev.add_argument("--home", default=str(Path.home()))
+    ev.add_argument("--aws-auth", metavar="FILE")
+    ev.add_argument("--aws-as", action="append", default=[], metavar="[AGENT=]PRINCIPAL")
+    ev.add_argument("--approvals", metavar="FILE", help="approvals ledger; adds the review and the integrity check")
+    ev.add_argument("--inventory", metavar="FILE", help="JSON AI inventory kept by the firm")
+    ev.add_argument("--framework", action="append", choices=list(comp.FRAMEWORKS) + ["all", "none"], default=None,
+                    help="compliance mapping(s) to include; repeat; default mas-airm; 'none' to skip")
+    ev.add_argument("--refs", choices=list(apv.REFS), default="mas", help="references printed in the approval review")
+    ev.add_argument("--format", choices=["json", "md"], default="json",
+                    help="json: one bundle with every file and its SHA-256 (save with > pack.json); md: one readable document")
     cp = sub.choices["compliance"]
     cp.add_argument("--approvals", metavar="FILE", help="approvals ledger, to evidence change-triggered re-approval (MAS 5.24-5.25)")
     cp.add_argument("--framework", action="append", choices=list(comp.FRAMEWORKS) + ["all"], default=None,
@@ -124,6 +140,16 @@ def main(argv=None):
         return 0
     if args.cmd in ("approve", "review"):
         return _approvals(args)
+    if args.cmd == "verify-ledger":
+        try:
+            res = apv.verify_ledger(apv.load_ledger(args.ledger))
+        except (OSError, ValueError, RecursionError) as e:
+            print(f"scopewake verify-ledger: {safe(e, 400)}", file=sys.stderr)
+            return 2
+        print(json.dumps(res, indent=2) if args.format == "json" else scrub(apv.verify_text(res)))
+        return 1 if res["status"] == "tampered" else 0
+    if args.cmd == "evidence":
+        return _evidence(args)
     if args.cmd not in ("scan", "compliance", "fix"):
         p.print_help()
         return 2
@@ -229,7 +255,7 @@ def _approvals(args):
             if not report["complete"]:
                 print(f"{name}: the scan was incomplete; the frozen reach may understate what the agents can reach.", file=sys.stderr)
             return 0
-        res = apv.review(ledger, report, today)
+        res = apv.review(ledger, report, today, refs=args.refs)
     except (OSError, ValueError, RecursionError) as e:
         print(f"{name}: {safe(e, 400)}", file=sys.stderr)
         return 2
@@ -240,6 +266,59 @@ def _approvals(args):
     else:
         print(scrub(apv.review_text(res, markdown=args.format == "md")))
     return 1 if args.fail_on_review and apv.needs_action(res) else 0
+
+
+def _evidence(args):
+    """Bundle scan, approval review, ledger check and compliance mapping, each with a SHA-256. Prints; writes nothing."""
+    import hashlib
+    from datetime import datetime, timezone
+    name = "scopewake evidence"
+    try:
+        ledger = apv.load_ledger(args.approvals) if args.approvals else None
+        inv = comp.load_inventory(args.inventory) if args.inventory else None
+        fws = args.framework or ["mas-airm"]
+        fws = [] if "none" in fws else list(comp.FRAMEWORKS) if "all" in fws else list(dict.fromkeys(fws))
+    except (OSError, ValueError, RecursionError) as e:
+        print(f"{name}: {safe(e, 400)}", file=sys.stderr)
+        return 2
+    agents, issues = _live(args)
+    files = {"scan.json": to_json(agents, issues), "scan.md": scrub(to_markdown(agents, issues))}
+    report = normalize(json.loads(files["scan.json"]), "<scan>")
+    rev, ver = None, None
+    if ledger is not None:
+        rev = apv.review(ledger, report, date.today(), refs=args.refs)
+        ver = apv.verify_ledger(ledger)
+        files["review.json"] = json.dumps(rev, indent=2)
+        files["review.md"] = scrub(apv.review_text(rev, markdown=True))
+        files["ledger.json"] = json.dumps(ledger, indent=2)
+        files["ledger-verification.json"] = json.dumps(ver, indent=2)
+    if fws:
+        pack = comp.build_pack(agents, inv, fws, issues, rev)
+        files["compliance.json"] = json.dumps(pack, indent=2)
+        files["compliance.md"] = scrub(comp.pack_markdown(pack))
+    digests = {fn: hashlib.sha256(text.encode("utf-8")).hexdigest() for fn, text in files.items()}
+    manifest = {"tool": "scopewake", "version": __version__, "kind": "evidence-pack",
+                "created_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+                "scan_complete": not issues, "frameworks": fws,
+                "ledger_head": apv.head_hash(ledger) if ledger is not None else "",
+                "ledger_status": ver["status"] if ver else "no ledger supplied",
+                "sha256": digests,
+                "note": "Indicative mapping, not legal advice. Each sha256 is over the UTF-8 text of that file in this pack."}
+    if args.format == "json":
+        print(json.dumps({"manifest": manifest, "files": files}, indent=2))
+    else:
+        L = [f"# Scopewake evidence pack ({manifest['created_utc']})", "",
+             f"Scan complete: {'yes' if not issues else 'NO, results may understate reach'}. "
+             f"Ledger: {manifest['ledger_status']}" + (f", head {manifest['ledger_head']}" if manifest["ledger_head"] else "") + ".", ""]
+        for fn in ("scan.md", "review.md", "compliance.md"):
+            if fn in files:
+                L += [f"<!-- {fn} sha256 {digests[fn]} -->", files[fn], ""]
+        L += ["## Manifest", "", "| File | SHA-256 |", "|---|---|"] + [f"| {fn} | `{h}` |" for fn, h in digests.items()]
+        L += ["", manifest["note"]]
+        print("\n".join(L))
+    if issues:
+        print(f"{name}: incomplete scan, {len(issues)} problem(s); results may understate risk.", file=sys.stderr)
+    return 0
 
 
 if __name__ == "__main__":

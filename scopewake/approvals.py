@@ -26,6 +26,8 @@ SOON_DAYS = 30
 REF_CHANGE = "MAS AIRM para 5.25(a), 5.24"
 REF_PERIODIC = "MAS AIRM para 4.11, 2.5(f)"
 REF_APPROVED = "MAS AIRM paras 2.3-2.5, 4.7"
+# Reference sets for review output. "none" gives neutral labels for users outside MAS's scope.
+REFS = {"mas": (REF_CHANGE, REF_PERIODIC, REF_APPROVED), "none": ("", "", "")}
 
 STATUS_ORDER = ["re-review required", "evidence expired", "verify", "expiring soon", "current"]
 
@@ -145,7 +147,95 @@ def approve(ledger: dict, report: dict, system: str, selectors: List[str], by: s
     else:
         out["approvals"].append(rec)
     out["approvals"].sort(key=lambda r: r["system"].lower())
-    return scrub_tree(out)
+    out = scrub_tree(out)
+    _log_event(out, next(r for r in out["approvals"] if r["system"].strip().lower() == system.strip().lower()),
+               "renewed" if rec["history"] else "approved", today)
+    return out
+
+
+# ---------------------------------------------------------------- integrity log
+# Every approve() appends an event whose hash covers the previous event and the full approval record. Editing an
+# approval, or an event, after the fact breaks the chain. A chain alone does not stop someone who rewrites the whole
+# file and recomputes every hash, so store the printed head hash somewhere else (a ticket, an email) as an anchor.
+
+def _canon(obj) -> bytes:
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+
+def record_hash(rec: dict) -> str:
+    return hashlib.sha256(_canon(rec)).hexdigest()
+
+
+def _event_hash(ev: dict) -> str:
+    return hashlib.sha256(_canon({k: ev[k] for k in ("seq", "on", "system", "action", "record_hash", "prev")})).hexdigest()
+
+
+def _append(ledger: dict, system: str, action: str, rhash: str, today: date):
+    log = ledger.setdefault("log", [])
+    prev = log[-1]["hash"] if log else "0" * 64
+    ev = {"seq": len(log) + 1, "on": _iso(today), "system": system, "action": action, "record_hash": rhash, "prev": prev}
+    ev["hash"] = _event_hash(ev)
+    log.append(ev)
+
+
+def _log_event(ledger: dict, rec: dict, action: str, today: date):
+    if not ledger.get("log"):
+        # Ledgers written before 0.4.0 have no log: record the other approvals as an unverified baseline first.
+        for r in ledger["approvals"]:
+            if r is not rec:
+                _append(ledger, r["system"], "baseline (approved before integrity log)", record_hash(r), today)
+    _append(ledger, rec["system"], action, record_hash(rec), today)
+
+
+def head_hash(ledger: dict) -> str:
+    log = ledger.get("log") or []
+    return log[-1]["hash"] if log else ""
+
+
+def verify_ledger(ledger: dict) -> dict:
+    """Check the integrity log: unbroken chain, and every current approval matches its latest logged record hash."""
+    problems, log = [], ledger.get("log")
+    if not isinstance(log, list) or not log:
+        return {"tool": "scopewake", "version": __version__, "kind": "ledger-verification", "status": "no integrity log",
+                "events": 0, "head": "", "problems": ["This ledger has no integrity log (written before 0.4.0). "
+                                                      "The next `scopewake approve` starts one."]}
+    prev, latest = "0" * 64, {}
+    for i, ev in enumerate(log, 1):
+        if not isinstance(ev, dict) or not all(isinstance(ev.get(k), (str, int)) for k in
+                                               ("seq", "on", "system", "action", "record_hash", "prev", "hash")):
+            problems.append(f"event {i} is malformed"); break
+        if ev["seq"] != i:
+            problems.append(f"event {i}: sequence number is {ev['seq']} (events removed or reordered)")
+        if ev["prev"] != prev:
+            problems.append(f"event {i}: does not link to the event before it (chain broken)")
+        if _event_hash(ev) != ev["hash"]:
+            problems.append(f"event {i}: contents changed after it was logged")
+        prev = ev["hash"]
+        latest[ev["system"].strip().lower()] = ev
+    for r in ledger.get("approvals", []):
+        ev = latest.get(str(r.get("system", "")).strip().lower())
+        if ev is None:
+            problems.append(f"approval '{safe(r.get('system', ''), 80)}' is not in the integrity log (added by hand?)")
+        elif record_hash(r) != ev["record_hash"]:
+            problems.append(f"approval '{safe(r.get('system', ''), 80)}' was edited after event {ev['seq']} was logged")
+    systems = {str(r.get("system", "")).strip().lower() for r in ledger.get("approvals", [])}
+    for k, ev in latest.items():
+        if k not in systems:
+            problems.append(f"logged approval '{safe(ev['system'], 80)}' is missing from the ledger (removed by hand?)")
+    baseline = sum(1 for ev in log if str(ev.get("action", "")).startswith("baseline"))
+    return {"tool": "scopewake", "version": __version__, "kind": "ledger-verification",
+            "status": "intact" if not problems else "tampered", "events": len(log), "baseline_events": baseline,
+            "head": log[-1].get("hash", ""), "problems": problems}
+
+
+def verify_text(res: dict) -> str:
+    L = [f"scopewake verify-ledger: {res['status']} ({res['events']} event(s))"]
+    if res.get("head"):
+        L.append(f"head hash: {res['head']}  (store this outside the ledger as an anchor)")
+    if res.get("baseline_events"):
+        L.append(f"{res['baseline_events']} approval(s) predate the log and are covered only from their baseline entry.")
+    L += ["  ! " + p for p in res["problems"]]
+    return "\n".join(L)
 
 
 # ---------------------------------------------------------------- review
@@ -179,7 +269,10 @@ def _reasons_for(old: dict, new: dict) -> List[dict]:
     return r
 
 
-def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS) -> dict:
+def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS, refs: str = "mas") -> dict:
+    if refs not in REFS:
+        raise ValueError("--refs must be one of: " + ", ".join(REFS))
+    ref_change, ref_periodic, ref_approved = REFS[refs]
     current = report["agents"]
     covered = set()
     rows = []
@@ -212,7 +305,7 @@ def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS) 
         else:
             status = "current"
         for x in reasons:
-            x["ref"] = REF_CHANGE if x.get("review") else REF_PERIODIC if (x.get("expired") or x.get("soon")) else ""
+            x["ref"] = ref_change if x.get("review") else ref_periodic if (x.get("expired") or x.get("soon")) else ""
         rows.append({"system": ap["system"], "owner": ap.get("owner", ""), "scope": ap.get("scope", ""),
                      "approved_by": ap["approved_by"], "approved_on": ap["approved_on"], "valid_until": ap["valid_until"],
                      "status": status, "reasons": reasons, "agents_checked": sorted(now)})
@@ -223,7 +316,7 @@ def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS) 
                        "scan_complete": report["complete"],
                        "disclaimer": "Indicative mapping, not legal advice. The owner decides whether a change is significant.",
                        "summary": counts, "approvals": rows, "unapproved_agents": unapproved,
-                       "unapproved_ref": REF_APPROVED if unapproved else ""})
+                       "unapproved_ref": ref_approved if unapproved else ""})
 
 
 def needs_action(res: dict) -> bool:
@@ -251,7 +344,7 @@ def review_text(res: dict, markdown: bool = False) -> str:
             L.append(f"{mark}: {safe(x['detail'], 300)}" + (f"  [{x['ref']}]" if x["ref"] else ""))
         L.append("")
     if res["unapproved_agents"]:
-        L.append(("## Agents with no approval" if markdown else "agents with no approval") + f"  [{res['unapproved_ref']}]")
+        L.append(("## Agents with no approval" if markdown else "agents with no approval") + (f"  [{res['unapproved_ref']}]" if res["unapproved_ref"] else ""))
         L += [("- " if markdown else "  - ") + safe(k, 200) for k in res["unapproved_agents"]]
     L += ["", res["disclaimer"]]
     return "\n".join(L)

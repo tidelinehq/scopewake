@@ -2,6 +2,10 @@
 
 ## Unreleased (0.4.0)
 
+- Approvals ledger integrity log: every `scopewake approve` appends a hash-chained event covering the full approval record. `scopewake verify-ledger FILE` reports intact, tampered (exit 1) or no integrity log, and prints the head hash to store elsewhere as an anchor. Older ledgers start the log on the next approval, with existing approvals recorded as a baseline.
+- `scopewake evidence`: one command bundles the scan, approval review, ledger verification and compliance mapping, each with a SHA-256, as JSON (default) or one Markdown document. Prints only; writes nothing.
+- `scopewake review --refs none`: neutral output without MAS paragraph references, for users outside MAS's scope. Default stays `mas`.
+- Fixed: evidence packs printed "(score )= 70)" because the display filter rewrites ">"; now "score 70 or above".
 - `scopewake vendors`: finds AI features inside the SaaS an institution already uses (MAS AIRM para 4.2 and fn 21) and shadow AI (para 4.4). Inputs are files the institution exports: an Okta or Microsoft Entra app list, a DNS/proxy domain summary and a browser-extension inventory. All matching is offline.
 - Matches are proposals only. The designated control function accepts or rejects each one (`--decide ID --decision accept|reject --by NAME`), and every decision is logged with the decider, the date and the catalogue version (para 4.3).
 - The institution can supply its own material-provider list (`--material`); proposals from those providers rank first. Scopewake does not decide materiality.
