@@ -4,6 +4,8 @@
 
 **Every AI agent's approved access, and what changed since.** Coding agents, Copilot and Agentforce agents, and the agents your teams build — in one tamper-evident approval record that works with the agent lists you already have in Microsoft Defender or ServiceNow.
 
+**Where it fits.** Agent security platforms find agents and enforce access. Scopewake is the record kept apart from them: who approved each agent, what it could reach that day, and every change since. It enforces nothing and reads the agent lists those platforms export (`scopewake import`), so it runs beside them, not instead of them.
+
 **If an AI agent on your machine were hijacked, what could it reach?** Scopewake finds the AI agents and coding assistants configured on a machine or repo, lists the credentials and capabilities each one can reach, and ranks them by worst-case blast radius. For regulated firms it keeps AI approvals current: when an agent's reach changes, it shows which approval needs review.
 
 - **Local and read-only.** It opens no network connection, writes no files, and is designed not to store or print secret values (names, kinds and locations only). Known secret shapes and every output field are redacted centrally, and tests plant synthetic secrets to check this. Redaction is pattern-based: an unrecognised secret format, or a secret split across fields, can still appear if a config puts one in a name or path. Tests and a source-policy check enforce the no-network, no-write design; they are not a proof.
