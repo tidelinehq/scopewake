@@ -349,3 +349,6 @@ details[open] > summary .plus::after, .tile.open .plus::after { transform: rotat
 .plain-next a { font-weight: 600; color: var(--teal); text-decoration: none; border-bottom: 2px solid currentColor; }
 @media (max-width: 1080px) { .plain-steps, .plain-grid { grid-template-columns: 1fr; } }
 @media (max-width: 720px) { .plain-step { padding: 22px 18px; } }
+
+/* Long hero buttons: let them wrap on narrow screens so they cannot widen the hero past the viewport. */
+@media (max-width: 720px) { .hero-copy { grid-template-columns: minmax(0, 1fr); } .hero-actions .btn { white-space: normal; text-align: center; } }
