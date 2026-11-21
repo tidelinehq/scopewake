@@ -156,6 +156,13 @@ GCP_BUILTIN = {
     "roles/deploymentmanager.editor": (["deploymentmanager.deployments.*"], []),
 }
 
+# What the exports can never show. Because of these, the result is granted reach, and effective reach stays unknown.
+STANDING_UNKNOWNS = {
+    "azure": ["eligible (PIM) assignments are not in the export", "Entra directory roles are not in the export",
+              "deny assignments are not evaluated"],
+    "gcp": ["bindings on parent resources outside the export are not seen", "deny policies and organisation policies are not evaluated"],
+}
+
 LIMITS = {
     "azure": ("Offline approximation: deny assignments, eligible (PIM) assignments, Entra directory roles and group "
               "members are not in the export and are not evaluated. Conditional assignments are marked."),
@@ -205,14 +212,17 @@ class Rbac:
         self.provider = provider
         self.principals: Dict[str, dict] = {}       # key -> {"name", "type", "grants": [...]}
         self.issues: List[str] = []
+        self.groups = 0          # assignments to groups or domains: their members are not in the export
         self.probes = AZURE_PROBES if provider == "azure" else GCP_PROBES
 
     def _grant(self, key: str, name: str, typ: str, allowed: Callable[[str], bool], level: str, role: str,
-               admin: bool, target: str = "", known: bool = True):
-        p = self.principals.setdefault(key, {"name": safe(name, 200), "type": safe(typ, 40), "grants": [], "unknown": []})
+               admin: bool, target: str = "", known: bool = True, approx: bool = False):
+        p = self.principals.setdefault(key, {"name": safe(name, 200), "type": safe(typ, 40), "grants": [], "unknown": [], "approx": []})
         p["grants"].append({"allowed": allowed, "level": level, "role": safe(role, 120), "admin": admin, "target": target})
         if not known and safe(role, 120) not in p["unknown"]:
             p["unknown"].append(safe(role, 120))
+        if approx and safe(role, 120) not in p["approx"]:
+            p["approx"].append(safe(role, 120))
 
     def direct_classes(self, key: str) -> Dict[str, dict]:
         found: Dict[str, dict] = {}
@@ -271,8 +281,16 @@ class Rbac:
         for c in classes:
             c.pop("_hops", None)
         p = self.principals[key]
+        unknowns = [f"role not evaluated: {r}" for r in sorted(p["unknown"])]
+        unknowns += [f"role approximated from its name: {r}" for r in sorted(p["approx"])]
+        if self.groups and p["type"].lower() not in ("group", "foreigngroup", "domain"):
+            unknowns.append("group membership is not in the export, so roles held through a group are missing")
         return {"provider": self.provider, "principal": safe(key, 200), "name": p["name"], "type": p["type"],
                 "max_severity": max((c["severity"] for c in classes), default=0), "classes": classes,
+                "basis": "roles granted in the export",
+                "effective_reach": "unknown",
+                "export_evaluated_exactly": not unknowns,
+                "unknowns": unknowns + STANDING_UNKNOWNS[self.provider],
                 "unevaluated_roles": sorted(p["unknown"]),
                 "assumable_roles": [self.principals[r]["name"] for r in self.assumable(key)]}
 
@@ -340,7 +358,7 @@ def load_azure(assignments, definitions=None) -> Rbac:
         if not pid:
             acct.issues.append("an assignment has no principal and was skipped")
             continue
-        role, known = str(x.get("roleDefinitionName") or "").strip(), True
+        role, known, approx = str(x.get("roleDefinitionName") or "").strip(), True, False
         rid = str(x.get("roleDefinitionId") or "").lower().rsplit("/", 1)[-1]
         perms = defs_by_name.get(role.lower())
         if perms is None and rid:
@@ -351,6 +369,7 @@ def load_azure(assignments, definitions=None) -> Rbac:
                 acct.issues.append(f"role not evaluated (no definition supplied): {safe(role or rid, 80)}")
                 perms, known = [], False
             else:
+                approx = True
                 acct.issues.append(f"built-in role approximated from its name: {safe(role, 80)}")
         allowed = _az_checker(perms)
         ptype = str(x.get("principalType") or "")
@@ -358,7 +377,8 @@ def load_azure(assignments, definitions=None) -> Rbac:
         level = _az_level(str(x.get("scope") or ""), x.get("condition"))
         admin = allowed("Microsoft.Authorization/roleAssignments/write") and allowed("Microsoft.Compute/virtualMachines/write") \
             and allowed("Microsoft.Storage/storageAccounts/delete")
-        acct._grant(pid, str(x.get("principalName") or pid), ptype or "principal", allowed, level, role or rid, admin, known=known)
+        acct._grant(pid, str(x.get("principalName") or pid), ptype or "principal", allowed, level, role or rid, admin, known=known, approx=approx)
+    acct.groups = groups
     if groups:
         acct.issues.append(f"{groups} assignment(s) are to groups; group members are not in the export, so reach through a group is not counted for its members")
     return acct
@@ -366,16 +386,16 @@ def load_azure(assignments, definitions=None) -> Rbac:
 
 # ---------------------------------------------------------------- GCP
 
-def _gcp_checker(role: str, defs: Dict[str, List[str]], issues: List[str]) -> Tuple[Callable[[str], bool], bool]:
+def _gcp_checker(role: str, defs: Dict[str, List[str]], issues: List[str]) -> Tuple[Callable[[str], bool], bool, bool]:
     if role in defs:
         have = set(defs[role])
-        return (lambda perm: perm in have), True
+        return (lambda perm: perm in have), True, False
     if role in GCP_BUILTIN:
         allow, deny = GCP_BUILTIN[role]
         issues.append(f"predefined role approximated from its name: {safe(role, 80)}")
-        return (lambda perm: any(fnmatchcase(perm, a) for a in allow) and not any(fnmatchcase(perm, d) for d in deny)), True
+        return (lambda perm: any(fnmatchcase(perm, a) for a in allow) and not any(fnmatchcase(perm, d) for d in deny)), True, True
     issues.append(f"role not evaluated (no permissions supplied): {safe(role, 120)}")
-    return (lambda perm: False), False
+    return (lambda perm: False), False, False
 
 
 _SA_RES = re.compile(r"//iam\.googleapis\.com/projects/[^/]+/serviceAccounts/([^/]+)$")
@@ -421,7 +441,7 @@ def load_gcp(policies, roles=None) -> Rbac:
             if not isinstance(b, dict) or not isinstance(b.get("role"), str):
                 continue
             role = b["role"]
-            allowed, known = _gcp_checker(role, defs, acct.issues)
+            allowed, known, approx = _gcp_checker(role, defs, acct.issues)
             level = "scoped" if not wide else "conditional" if b.get("condition") else "full"
             target = f"serviceAccount:{sa.group(1)}" if sa else ""
             for m in _strs(b.get("members")):
@@ -430,8 +450,9 @@ def load_gcp(policies, roles=None) -> Rbac:
                 typ = m.split(":", 1)[0] if ":" in m else m
                 groups += typ in ("group", "domain")
                 public += m in ("allUsers", "allAuthenticatedUsers")
-                acct._grant(m, m, typ, allowed, level, role, role == "roles/owner", target, known)
+                acct._grant(m, m, typ, allowed, level, role, role == "roles/owner", target, known, approx)
     acct.issues = sorted(set(acct.issues))
+    acct.groups = groups
     if groups:
         acct.issues.append(f"{groups} binding member(s) are groups or domains; their members are not in the export, so reach through them is not counted for the members")
     if public:
@@ -448,15 +469,19 @@ def analyse(acct: Rbac) -> Tuple[List[dict], List[str]]:
 
 
 def principals_text(provider: str, rows: List[dict], issues: List[str]) -> str:
-    out = [f"scopewake {provider}: principals ranked by worst reachable action class", LIMITS[provider], ""]
+    out = [f"scopewake {provider}: principals ranked by worst action class granted in the export", LIMITS[provider],
+           "This is granted reach. Effective reach is unknown for every principal: " + "; ".join(STANDING_UNKNOWNS[provider]) + ".", ""]
     if issues:
         out += [f"WARNING {len(issues)} note(s) on what could not be evaluated exactly:"] + [f"  - {safe(i, 240)}" for i in issues] + [""]
     for i, r in enumerate(rows, 1):
-        out.append(f"{i}. {safe(r['type'], 20):<16} {safe(r['name'], 70):<40} worst severity {r['max_severity']:>2}")
+        verdict = f"worst severity {r['max_severity']:>2}" if r["classes"] else "no high-impact grant found in this export (not a finding of no access)"
+        out.append(f"{i}. {safe(r['type'], 20):<16} {safe(r['name'], 70):<40} {verdict}")
         for c in r["classes"][:4]:
             out.append(f"     - {c['class']} ({c['level']}, {safe(c['via'], 120)}): {c['impact']}")
         for role in r["unevaluated_roles"]:
             out.append(f"     ! role not evaluated, so this may understate reach: {safe(role, 120)}")
+        if not r["export_evaluated_exactly"]:
+            out.append("     ? may be understated: " + "; ".join(safe(u, 120) for u in r["unknowns"] if u not in STANDING_UNKNOWNS[provider]))
     return "\n".join(out)
 
 
@@ -488,13 +513,19 @@ def attach(agents, acct: Rbac, mapping: Dict[str, str]) -> List[str]:
             continue
         r = acct.reach(pk)
         issues += [f"{a.name}: {label} role not evaluated, so its reach may be understated: {role}" for role in r["unevaluated_roles"]]
+        if not r["export_evaluated_exactly"]:
+            issues.append(f"{a.name}: {label} reach may be understated ({'; '.join(u for u in r['unknowns'] if u not in STANDING_UNKNOWNS[prov])})")
         a.clouds.append({"provider": prov, "principal": r["principal"], "name": r["name"], "type": r["type"],
-                         "max_severity": r["max_severity"], "classes": r["classes"]})
+                         "max_severity": r["max_severity"], "classes": r["classes"], "basis": r["basis"],
+                         "effective_reach": "unknown", "unknowns": r["unknowns"]})
         for c in r["classes"]:
             a.capabilities.append(Capability(f"{prov}:{c['class']}", c["severity"], False, via=f"{prov} {r['type']} {r['name']} ({c['via']})"))
         for c in a.credentials:
             if c.kind in CRED_KINDS[prov] or (c.kind == "ci-secret" and CRED_NAMES[prov].search(c.name or "")):
-                c.severity = max(3, r["max_severity"]) if r["classes"] else 3
-        a.notes.append(f"{label} reach from the export for {r['type']} {r['name']}: worst severity {r['max_severity']} "
-                       f"({', '.join(c['class'] for c in r['classes']) or 'no high-impact actions'}). {LIMITS[prov]}")
+                # An export can show more reach than assumed, never less: roles held through groups, PIM or
+                # directory roles are outside it. So this may raise a credential's severity and never lowers it.
+                c.severity = max(c.severity, r["max_severity"])
+        a.notes.append(f"{label} granted reach from the export for {r['type']} {r['name']}: worst severity {r['max_severity']} "
+                       f"({', '.join(c['class'] for c in r['classes']) or 'no high-impact grant found, which is not a finding of no access'}). "
+                       f"Effective reach is unknown. {LIMITS[prov]}")
     return sorted(set(issues + acct.issues))

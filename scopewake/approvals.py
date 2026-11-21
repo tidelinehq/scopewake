@@ -387,6 +387,13 @@ def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS, 
             for x in _reasons_for(snap[k], now[k]) + _indirect_reasons(snap[k], ind_now.get(k, [])):
                 x["detail"] = f"{k}: {x['detail']}"
                 reasons.append(x)
+        clouds = sorted({c["name"].split(":")[0] for a in now.values() for c in a["capabilities"]
+                         if c["name"].startswith(("azure:", "gcp:"))})
+        if clouds:
+            reasons.append({"type": "cloud reach is granted reach only",
+                            "detail": f"{' and '.join(clouds)} reach comes from a role export: roles held through groups, eligible "
+                                      "assignments, directory roles and deny rules are outside it, so effective reach is unknown",
+                            "review": False, "qualified": True})
         until = _parse_date(ap["valid_until"], "valid_until")
         if today > until:
             reasons.append({"type": "evidence expired", "detail": f"approval evidence expired on {ap['valid_until']}", "review": False, "expired": True})

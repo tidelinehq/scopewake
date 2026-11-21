@@ -158,7 +158,8 @@ def main(argv=None):
             return 2
         if args.format == "json":
             print(json.dumps(scrub_tree({"tool": "scopewake", "version": __version__, "provider": args.cmd, "note": rbac.LIMITS[args.cmd],
-                                         "coverage": {"complete": not rissues, "issues": rissues}, "principals": rows}), indent=2))
+                                         "coverage": {"complete": not rissues, "issues": rissues, "effective_reach_determined": False,
+                                                      "always_unknown": rbac.STANDING_UNKNOWNS[args.cmd]}, "principals": rows}), indent=2))
         else:
             print(scrub(rbac.principals_text(args.cmd, rows, rissues)))
         return 0

@@ -135,7 +135,7 @@ class AttachAndCliTests(unittest.TestCase):
         issues = rb.attach([az, other], rb.load_azure(J("azure_assignments.json"), J("azure_roles.json")), {"*": "invoice-agent"})
         self.assertEqual([c.name for c in az.capabilities], ["azure:data-read", "azure:secrets-read"])
         self.assertEqual(az.clouds[0]["provider"], "azure")
-        self.assertEqual(az.credentials[0].severity, 7)
+        self.assertEqual(az.credentials[0].severity, 9)      # an export may raise a credential's severity, never lower it
         self.assertEqual(other.clouds, [])
         self.assertTrue(issues)
         doc = json.loads(to_json([az]))
@@ -156,6 +156,73 @@ class AttachAndCliTests(unittest.TestCase):
         self.assertEqual((code, doc["provider"], doc["coverage"]["complete"]), (0, "gcp", False))
         self.assertEqual(run(["gcp", str(FX / "azure_assignments.json")])[0], 2)
         self.assertEqual(run(["azure", str(FX / "missing.json")])[0], 2)
+
+
+class FailClosedTests(unittest.TestCase):
+    """Missing group membership, deny rules or role definitions must never read as a clean result."""
+
+    def agent(self):
+        return Agent(id="cursor:x", name="Invoice agent", kind="cursor", source="x", credentials=[Credential("azure-token-cache", 9, "~/x", "readable-file")])
+
+    def report(self, agents, issues):
+        from scopewake.diff import normalize
+        return normalize(json.loads(to_json(agents, issues)))
+
+    def test_every_principal_reports_effective_reach_unknown(self):
+        for acct in (rb.load_azure(J("azure_assignments.json"), J("azure_roles.json")), rb.load_gcp(J("gcp_policy.json"), J("gcp_roles.json"))):
+            rows, _ = rb.analyse(acct)
+            for r in rows:
+                self.assertEqual(r["effective_reach"], "unknown")
+                self.assertTrue(set(rb.STANDING_UNKNOWNS[acct.provider]) <= set(r["unknowns"]))
+
+    def test_no_grant_found_is_not_reported_as_no_access(self):
+        code, out, _ = run(["azure", str(FX / "azure_assignments.json")])
+        self.assertIn("reader-bot", out)
+        self.assertIn("not a finding of no access", out)
+        self.assertNotIn("worst severity  0", out)
+        doc = json.loads(run(["azure", str(FX / "azure_assignments.json"), "--format", "json"])[1])
+        self.assertFalse(doc["coverage"]["effective_reach_determined"])
+
+    def test_low_or_unknown_roles_never_lower_a_credential(self):
+        acct = rb.load_azure(J("azure_assignments.json"), J("azure_roles.json"))
+        for who in ("reader-bot", "mystery-bot"):
+            a = self.agent()
+            rb.attach([a], acct, {"*": who})
+            self.assertEqual(a.credentials[0].severity, 9, who)
+            self.assertEqual(a.clouds[0]["effective_reach"], "unknown")
+
+    def test_group_in_export_marks_other_principals_as_possibly_understated(self):
+        acct = rb.load_azure(J("azure_assignments.json"), J("azure_roles.json"))
+        r = acct.reach(acct.find("custom-bot"))
+        self.assertFalse(r["export_evaluated_exactly"])
+        self.assertTrue(any("group membership" in u for u in r["unknowns"]))
+
+    def test_inexact_export_can_never_give_a_current_approval(self):
+        from scopewake import approvals as apv
+        from datetime import date
+        a = self.agent()
+        issues = rb.attach([a], rb.load_azure(J("azure_assignments.json"), J("azure_roles.json")), {"*": "custom-bot"})
+        self.assertTrue(any("may be understated" in i for i in issues))
+        rep = self.report([a], issues)
+        self.assertFalse(rep["complete"])
+        led = apv.approve(apv.empty_ledger(), rep, "Invoices", ["Invoice agent"], "Risk", date(2026, 11, 1))
+        row = apv.review(led, rep, date(2026, 11, 2))["approvals"][0]
+        self.assertEqual(row["status"], "verify")
+
+    def test_exact_export_is_current_but_always_qualified(self):
+        from scopewake import approvals as apv
+        from datetime import date
+        exact = [x for x in J("azure_assignments.json") if x["principalName"] == "custom-bot"]
+        a = self.agent()
+        issues = rb.attach([a], rb.load_azure(exact, J("azure_roles.json")), {"*": "custom-bot"})
+        self.assertEqual(issues, [])
+        rep = self.report([a], issues)
+        led = apv.approve(apv.empty_ledger(), rep, "Invoices", ["Invoice agent"], "Risk", date(2026, 11, 1))
+        row = apv.review(led, rep, date(2026, 11, 2))["approvals"][0]
+        self.assertEqual(row["status"], "current")
+        q = [x for x in row["reasons"] if x["type"] == "cloud reach is granted reach only"]
+        self.assertEqual(len(q), 1)
+        self.assertIn("effective reach is unknown", q[0]["detail"])
 
 
 if __name__ == "__main__":

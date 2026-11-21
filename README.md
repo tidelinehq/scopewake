@@ -77,6 +77,8 @@ scopewake scan . --gcp-auth gcp-policy.json --gcp-as serviceAccount:invoice-agen
 
 The action classes are the ones `scopewake aws` reports. A role assigned at a subscription, management group, project, folder or organisation is `full`; one assigned on a single resource is `scoped`; one with a condition is `conditional`. On Google Cloud, a principal that can act as a service account also gets that account's reach, up to three hops. The roles file for Google Cloud is a JSON object or list with `name` and `includedPermissions`, for example the output of `gcloud iam roles describe ROLE --project PROJECT --format=json` for each custom role.
 
+What the result is: *granted* reach, read from the export. Effective reach is reported as unknown for every identity, because the exports cannot show it. An identity with no high-impact grant is reported as "no high-impact grant found in this export", which is not a finding of no access. Attaching an export can raise a credential's severity and never lowers it. An approval on an agent with cloud reach always carries that qualification, and reads "verify", not "current", whenever the export had groups, approximated roles or unknown roles.
+
 Limits, stated in every report:
 - Azure deny assignments, eligible (PIM) assignments and Entra directory roles are not in the export. Google Cloud deny policies, organisation policies and bindings on parents outside the export are not seen. Conditions are marked, never evaluated.
 - Group members are not in either export. Reach granted to a group is shown for the group, not for its members, so an agent whose identity is in a group can have more reach than shown. The report says so and is marked incomplete.
