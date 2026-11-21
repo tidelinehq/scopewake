@@ -29,7 +29,7 @@ From source: `python -m scopewake scan .`
 - **Score (0 to 100):** reach (how many high-severity credentials and capabilities, after deny rules) x autonomy (does it ask before acting?) x exposure (does it read untrusted content?).
 
 ## What it does not do (yet)
-It never calls cloud APIs (AWS reach comes from an IAM export you supply; GCP and Azure are not analysed yet), does not verify credentials are live, does not parse every agent's config format (Codex TOML is detected only), and cannot see agents running outside the scanned locations. Pattern matching can miss unusual secrets and can flag harmless strings.
+It never calls cloud APIs (AWS, Azure and Google Cloud reach comes from exports you supply, and is an approximation), does not verify credentials are live, does not parse every agent's config format (Codex TOML is detected only), and cannot see agents running outside the scanned locations. Pattern matching can miss unusual secrets and can flag harmless strings.
 
 ## AWS: what a key could do, according to your IAM export
 
@@ -58,6 +58,29 @@ Limits: service control policies, resource policies, session policies and most c
 export, so they are not evaluated. An Allow with a Condition is shown as `conditional`. Policies missing from the
 export are listed as problems, never silently counted as zero. When a mapped identity has no high-impact actions,
 the credential's severity drops accordingly, so read-only keys stop dominating the ranking.
+
+## Azure and Google Cloud: the same question, from role exports
+
+```bash
+# Azure: you run these with any identity that can read role assignments
+az role assignment list --all --output json > azure-assignments.json
+az role definition list --output json > azure-roles.json          # optional, makes every role exact
+scopewake azure azure-assignments.json --roles azure-roles.json
+scopewake scan . --azure-auth azure-assignments.json --azure-roles azure-roles.json --azure-as invoice-agent
+
+# Google Cloud: one project, or many resources through Asset Inventory
+gcloud projects get-iam-policy PROJECT --format=json > gcp-policy.json
+gcloud asset search-all-iam-policies --scope=organizations/ORG_ID --format=json > gcp-policy.json
+scopewake gcp gcp-policy.json --roles gcp-roles.json               # roles file optional; needed for custom roles
+scopewake scan . --gcp-auth gcp-policy.json --gcp-as serviceAccount:invoice-agent@PROJECT.iam.gserviceaccount.com
+```
+
+The action classes are the ones `scopewake aws` reports. A role assigned at a subscription, management group, project, folder or organisation is `full`; one assigned on a single resource is `scoped`; one with a condition is `conditional`. On Google Cloud, a principal that can act as a service account also gets that account's reach, up to three hops. The roles file for Google Cloud is a JSON object or list with `name` and `includedPermissions`, for example the output of `gcloud iam roles describe ROLE --project PROJECT --format=json` for each custom role.
+
+Limits, stated in every report:
+- Azure deny assignments, eligible (PIM) assignments and Entra directory roles are not in the export. Google Cloud deny policies, organisation policies and bindings on parents outside the export are not seen. Conditions are marked, never evaluated.
+- Group members are not in either export. Reach granted to a group is shown for the group, not for its members, so an agent whose identity is in a group can have more reach than shown. The report says so and is marked incomplete.
+- A role with no definition supplied is evaluated from a short built-in table and marked "approximated from its name". A role in neither place is listed as not evaluated and flagged on the principal; it is never counted as zero.
 
 ## Security
 See `SECURITY_REVIEW.md`. Report issues privately before publishing details.

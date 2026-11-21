@@ -10,6 +10,7 @@ from .safe import safe, scrub, scrub_tree
 from .scanner import get_issues, scan
 from .scoring import score_all
 from . import aws as awsmod
+from . import cloudrbac as rbac
 from . import compliance as comp
 from .fix import fixes
 from . import approvals as apv
@@ -127,7 +128,36 @@ def main(argv=None):
     vc = sub.add_parser("catalogue-diff", help="compare two vendor AI catalogue versions (monthly re-check log)")
     vc.add_argument("old")
     vc.add_argument("new")
+    for name in ("scan", "compliance", "fix", "approve", "review", "evidence", "reach"):
+        c = sub.choices[name]
+        c.add_argument("--azure-auth", metavar="FILE", help="output of `az role assignment list --all --output json` (read offline)")
+        c.add_argument("--azure-roles", metavar="FILE", help="output of `az role definition list --output json`, for exact role actions")
+        c.add_argument("--azure-as", action="append", default=[], metavar="[AGENT=]PRINCIPAL",
+                       help="Azure principal (name or object id) the agents' Azure credentials belong to")
+        c.add_argument("--gcp-auth", metavar="FILE", help="output of `gcloud projects get-iam-policy` or `gcloud asset search-all-iam-policies` as JSON")
+        c.add_argument("--gcp-roles", metavar="FILE", help="role definitions with includedPermissions (JSON object or list), for custom roles")
+        c.add_argument("--gcp-as", action="append", default=[], metavar="[AGENT=]PRINCIPAL",
+                       help="Google Cloud member (e.g. serviceAccount:x@p.iam.gserviceaccount.com) the agents' credentials belong to")
+    for name, cmd in (("azure", "az role assignment list --all --output json"), ("gcp", "gcloud projects get-iam-policy PROJECT --format=json")):
+        c = sub.add_parser(name, help=f"rank {'Azure' if name == 'azure' else 'Google Cloud'} principals in an export by what they can reach")
+        c.add_argument("export", help=f"output of `{cmd}`")
+        c.add_argument("--roles", metavar="FILE", help="role definitions export, for exact evaluation")
+        c.add_argument("--format", choices=["text", "json"], default="text")
     args = p.parse_args(argv)
+    if args.cmd in ("azure", "gcp"):
+        try:
+            roles = rbac.read_json(args.roles) if args.roles else None
+            acct = (rbac.load_azure if args.cmd == "azure" else rbac.load_gcp)(rbac.read_json(args.export), roles)
+            rows, rissues = rbac.analyse(acct)
+        except (OSError, ValueError) as e:
+            print(f"scopewake {args.cmd}: {safe(e, 400)}", file=sys.stderr)
+            return 2
+        if args.format == "json":
+            print(json.dumps(scrub_tree({"tool": "scopewake", "version": __version__, "provider": args.cmd, "note": rbac.LIMITS[args.cmd],
+                                         "coverage": {"complete": not rissues, "issues": rissues}, "principals": rows}), indent=2))
+        else:
+            print(scrub(rbac.principals_text(args.cmd, rows, rissues)))
+        return 0
     if args.cmd == "vendors":
         return _vendors(args)
     if args.cmd == "catalogue-diff":
@@ -248,6 +278,14 @@ def _live(args):
             issues += awsmod.attach(agents, awsmod.load_export(args.aws_auth), awsmod.parse_mapping(args.aws_as))
         except (OSError, ValueError) as e:
             issues.append(f"AWS export not analysed: {e}")
+    for prov, loader, auth, roles, who in (("azure", rbac.load_azure, args.azure_auth, args.azure_roles, args.azure_as),
+                                           ("gcp", rbac.load_gcp, args.gcp_auth, args.gcp_roles, args.gcp_as)):
+        if auth:
+            try:
+                acct = loader(rbac.read_json(auth), rbac.read_json(roles) if roles else None)
+                issues += rbac.attach(agents, acct, awsmod.parse_mapping(who))
+            except (OSError, ValueError) as e:
+                issues.append(f"{prov} export not analysed: {e}")
     return score_all(agents), issues
 
 

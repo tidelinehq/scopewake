@@ -1,0 +1,4 @@
+[
+ {"roleName": "Finance Ops Custom", "roleType": "CustomRole", "name": "c0ffee", "permissions": [{"actions": ["Microsoft.Compute/virtualMachines/*", "Microsoft.Insights/diagnosticSettings/*"], "notActions": ["Microsoft.Compute/virtualMachines/delete"], "dataActions": [], "notDataActions": []}]},
+ {"roleName": "Contributor", "roleType": "BuiltInRole", "name": "b24988ac", "permissions": [{"actions": ["*"], "notActions": ["Microsoft.Authorization/*/Delete", "Microsoft.Authorization/*/Write", "Microsoft.Authorization/elevateAccess/Action"], "dataActions": [], "notDataActions": []}]}
+]

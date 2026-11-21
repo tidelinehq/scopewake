@@ -1,0 +1,17 @@
+[
+ {"resource": "//cloudresourcemanager.googleapis.com/projects/acme-prod", "project": "projects/123", "policy": {"bindings": [
+   {"role": "roles/owner", "members": ["user:alice@acme.com"]},
+   {"role": "roles/editor", "members": ["serviceAccount:ci@acme-prod.iam.gserviceaccount.com"]},
+   {"role": "roles/secretmanager.secretAccessor", "members": ["serviceAccount:invoice-agent@acme-prod.iam.gserviceaccount.com"], "condition": {"title": "invoices only", "expression": "resource.name.startsWith('projects/123/secrets/inv')"}},
+   {"role": "roles/iam.serviceAccountTokenCreator", "members": ["serviceAccount:helper@acme-prod.iam.gserviceaccount.com", "group:devs@acme.com"]},
+   {"role": "projects/acme-prod/roles/invoiceReader", "members": ["serviceAccount:reader@acme-prod.iam.gserviceaccount.com"]},
+   {"role": "roles/some.unlistedRole", "members": ["serviceAccount:mystery@acme-prod.iam.gserviceaccount.com"]},
+   {"role": "roles/storage.objectViewer", "members": ["allUsers", "deleted:user:gone@acme.com?uid=1"]}
+ ]}},
+ {"resource": "//iam.googleapis.com/projects/acme-prod/serviceAccounts/ci@acme-prod.iam.gserviceaccount.com", "project": "projects/123", "policy": {"bindings": [
+   {"role": "roles/iam.serviceAccountUser", "members": ["serviceAccount:narrow@acme-prod.iam.gserviceaccount.com"]}
+ ]}},
+ {"resource": "//storage.googleapis.com/invoices-bucket", "project": "projects/123", "policy": {"bindings": [
+   {"role": "roles/storage.objectAdmin", "members": ["serviceAccount:reader@acme-prod.iam.gserviceaccount.com"]}
+ ]}}
+]

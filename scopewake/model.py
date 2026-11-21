@@ -44,6 +44,7 @@ class Agent:
     trifecta_parts: dict = field(default_factory=dict)
     cloud: dict = field(default_factory=dict)  # IAM reach when an AWS export is supplied
     servers: List[dict] = field(default_factory=list)  # MCP server fingerprints for change detection (no values)
+    clouds: List[dict] = field(default_factory=list)   # Azure / GCP reach when those exports are supplied
 
     def to_dict(self):
         d = asdict(self)

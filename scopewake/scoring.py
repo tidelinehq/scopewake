@@ -95,6 +95,10 @@ def score_agent(a: Agent) -> Agent:
     if a.cloud.get("max_severity", 0) >= 9:
         a.fixes.append(f"Give this agent its own IAM role with only the actions it needs instead of {a.cloud.get('type')} {a.cloud.get('name')} "
                       f"(reaches: {', '.join(c['class'] for c in a.cloud.get('classes', [])[:3])}).")
+    for cl in a.clouds:
+        if cl.get("max_severity", 0) >= 9:
+            a.fixes.append(f"Give this agent its own {cl.get('provider')} identity with only the roles it needs instead of {cl.get('type')} {cl.get('name')} "
+                           f"(reaches: {', '.join(c['class'] for c in cl.get('classes', [])[:3])}).")
     if a.autonomy >= 0.9:
         a.fixes.append("Require approval for shell commands; remove unrestricted Bash allow rules and bypass modes.")
     if entries and any(c.name == "shell-execution" for c in a.capabilities):

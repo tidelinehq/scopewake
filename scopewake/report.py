@@ -52,6 +52,9 @@ def to_markdown(agents: List[Agent], issues: Optional[List[str]] = None) -> str:
         if a.cloud:
             lines += ["", f"AWS reach as {safe(a.cloud.get('type'), 8)} `{safe(a.cloud.get('name'), 60)}` (from IAM export, approximate):"]
             lines += [f"- {c['class']} severity {c['severity']} ({c['level']}, {safe(c['via'], 120)}): {c['impact']}" for c in a.cloud.get("classes", [])] or ["- no high-impact action classes"]
+        for cl in a.clouds:
+            lines += ["", f"{safe(cl.get('provider'), 8)} reach as {safe(cl.get('type'), 20)} `{safe(cl.get('name'), 80)}` (from your export, approximate):"]
+            lines += [f"- {c['class']} severity {c['severity']} ({c['level']}, {safe(c['via'], 120)}): {c['impact']}" for c in cl.get("classes", [])] or ["- no high-impact action classes"]
         if a.chains:
             lines += ["", "Worst-case chains:"] + [f"- {safe(c, 400)}" for c in a.chains]
         if a.fixes:
@@ -72,6 +75,9 @@ def to_text(agents: List[Agent], issues: Optional[List[str]] = None) -> str:
         if a.cloud:
             out.append(f"     aws: {safe(a.cloud.get('type'), 8)} {safe(a.cloud.get('name'), 60)} worst severity {a.cloud.get('max_severity')} "
                        f"({', '.join(c['class'] for c in a.cloud.get('classes', [])[:4]) or 'no high-impact actions'})")
+        for cl in a.clouds:
+            out.append(f"     {safe(cl.get('provider'), 8)}: {safe(cl.get('type'), 20)} {safe(cl.get('name'), 80)} worst severity {cl.get('max_severity')} "
+                       f"({', '.join(c['class'] for c in cl.get('classes', [])[:4]) or 'no high-impact actions'})")
         for ch in a.chains[:2]:
             out.append(f"     - {safe(ch, 400)}")
         for f in a.fixes[:2]:

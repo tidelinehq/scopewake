@@ -1,0 +1,10 @@
+[
+ {"principalId": "11111111-0000-0000-0000-000000000001", "principalName": "alice@contoso.com", "principalType": "User", "roleDefinitionName": "Owner", "roleDefinitionId": "/subscriptions/s1/providers/Microsoft.Authorization/roleDefinitions/8e3af657", "scope": "/subscriptions/s1"},
+ {"principalId": "11111111-0000-0000-0000-000000000002", "principalName": "ci-deployer", "principalType": "ServicePrincipal", "roleDefinitionName": "Contributor", "scope": "/subscriptions/s1"},
+ {"principalId": "11111111-0000-0000-0000-000000000003", "principalName": "invoice-agent", "principalType": "ServicePrincipal", "roleDefinitionName": "Key Vault Secrets User", "scope": "/subscriptions/s1/resourceGroups/finance/providers/Microsoft.KeyVault/vaults/kv1"},
+ {"principalId": "11111111-0000-0000-0000-000000000003", "principalName": "invoice-agent", "principalType": "ServicePrincipal", "roleDefinitionName": "Storage Blob Data Reader", "scope": "/subscriptions/s1", "condition": "@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name] StringEquals 'invoices'"},
+ {"principalId": "11111111-0000-0000-0000-000000000004", "principalName": "reader-bot", "principalType": "ServicePrincipal", "roleDefinitionName": "Reader", "scope": "/subscriptions/s1"},
+ {"principalId": "11111111-0000-0000-0000-000000000005", "principalName": "Platform Admins", "principalType": "Group", "roleDefinitionName": "User Access Administrator", "scope": "/providers/Microsoft.Management/managementGroups/root"},
+ {"principalId": "11111111-0000-0000-0000-000000000006", "principalName": "custom-bot", "principalType": "ServicePrincipal", "roleDefinitionName": "Finance Ops Custom", "roleDefinitionId": "/subscriptions/s1/providers/Microsoft.Authorization/roleDefinitions/c0ffee", "scope": "/subscriptions/s1"},
+ {"principalId": "11111111-0000-0000-0000-000000000007", "principalName": "mystery-bot", "principalType": "ServicePrincipal", "roleDefinitionName": "Some Unlisted Role", "scope": "/subscriptions/s1"}
+]

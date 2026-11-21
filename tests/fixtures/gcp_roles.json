@@ -1,0 +1,1 @@
+[{"name": "projects/acme-prod/roles/invoiceReader", "title": "Invoice reader", "includedPermissions": ["bigquery.tables.getData", "storage.objects.list"]}]
