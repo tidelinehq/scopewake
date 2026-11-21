@@ -76,7 +76,11 @@ def main(argv=None):
     mg.add_argument("reports", nargs="+")
     vl = sub.add_parser("verify-ledger", help="check the approvals ledger's integrity log for edits made after the fact")
     vl.add_argument("ledger")
+    vl.add_argument("--expect-head", metavar="HASH", default="", help="a head hash you stored outside the ledger; detects a ledger rolled back or replaced")
     vl.add_argument("--format", choices=["text", "json"], default="text")
+    ve = sub.add_parser("verify-evidence", help="recompute an evidence pack's hashes and re-check the ledger inside it")
+    ve.add_argument("pack", help="a pack written by `scopewake evidence --format json`")
+    ve.add_argument("--format", choices=["text", "json"], default="text")
     ev = sub.add_parser("evidence", help="write a dated evidence pack (scan, approval review, compliance mapping) with a SHA-256 manifest")
     ev.add_argument("path", nargs="?", default=".")
     ev.add_argument("--home", default=str(Path.home()))
@@ -218,11 +222,29 @@ def main(argv=None):
         return 0
     if args.cmd == "verify-ledger":
         try:
-            res = apv.verify_ledger(apv.load_ledger(args.ledger))
+            res = apv.verify_ledger(apv.load_ledger(args.ledger), args.expect_head)
         except (OSError, ValueError, RecursionError) as e:
             print(f"scopewake verify-ledger: {safe(e, 400)}", file=sys.stderr)
             return 2
         print(json.dumps(res, indent=2) if args.format == "json" else scrub(apv.verify_text(res)))
+        return 1 if res["status"] == "tampered" else 0
+    if args.cmd == "verify-evidence":
+        try:
+            pk = Path(args.pack)
+            if pk.stat().st_size > 64 * 1024 * 1024:
+                raise ValueError("evidence pack is larger than 64 MB")
+            data = json.loads(pk.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                raise ValueError("not a scopewake evidence pack")
+            res = apv.verify_pack(data)
+        except (OSError, ValueError, RecursionError) as e:
+            print(f"scopewake verify-evidence: {safe(e, 400)}", file=sys.stderr)
+            return 2
+        if args.format == "json":
+            print(json.dumps(res, indent=2))
+        else:
+            print(scrub("\n".join([f"scopewake verify-evidence: {res['status']} ({res['files']} file(s), ledger: {res['ledger']})"]
+                                  + [f"  - {x}" for x in res["problems"]] + [res["note"]])))
         return 1 if res["status"] == "tampered" else 0
     if args.cmd == "evidence":
         return _evidence(args)

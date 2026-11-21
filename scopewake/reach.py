@@ -41,6 +41,36 @@ def links(a: dict) -> List[str]:
     return sorted(x for x in out if x)
 
 
+def evidence_for(a: dict) -> Dict[Tuple[str, str], List[str]]:
+    """Where each direct target was read from. Credentials and servers come from the scan of the agent's own files."""
+    ev: Dict[Tuple[str, str], set] = {}
+    for c in a["capabilities"]:
+        if not c["name"].startswith(LINK_PREFIX):
+            ev.setdefault(("capability", c["name"]), set()).add(c["via"] or "agent configuration")
+    out = {k: sorted(v) for k, v in ev.items()}
+    for t in direct_targets(a):
+        out.setdefault(t, ["cloud export (approximate)"] if t[0] == "cloud" else ["agent configuration"])
+    return out
+
+
+def link_evidence(a: dict) -> Dict[str, List[str]]:
+    ev: Dict[str, set] = {}
+    for c in a["capabilities"]:
+        if c["name"].startswith(LINK_PREFIX):
+            ev.setdefault(c["name"][len(LINK_PREFIX):].split("#")[0].strip(), set()).add(c["via"] or "agent configuration")
+    return {k: sorted(v) for k, v in ev.items()}
+
+
+# What an edge in this graph does and does not claim. Each later state needs evidence this tool does not collect.
+SEMANTICS = {
+    "state": "configured",
+    "ladder": ["configured", "connected", "invocable", "authorised", "effective", "observed"],
+    "meaning": "Every edge is configured reach: it is written in the agent's configuration or declared in an export. "
+               "The graph does not show that a connection works, that a call would be authorised at run time, what "
+               "the effective permission is after deny rules or group membership, or that anything was ever invoked.",
+}
+
+
 def build(report: dict) -> dict:
     agents = {agent_key(a): a for a in report["agents"].values()}
     by_name: Dict[str, List[str]] = {}
@@ -60,6 +90,14 @@ def build(report: dict) -> dict:
                 unresolved.append({"agent": k, "link": label})
         edges[k] = sorted(set(edges[k]))
     direct = {k: direct_targets(a) for k, a in agents.items()}
+    evid = {k: evidence_for(a) for k, a in agents.items()}
+    link_ev = {k: link_evidence(a) for k, a in agents.items()}
+    resolved_as: Dict[Tuple[str, str], str] = {}
+    for k, a in agents.items():
+        for label in links(a):
+            hits = sorted(set(by_name.get(label.lower(), [])) - {k})
+            if len(hits) == 1:
+                resolved_as[(k, hits[0])] = label
     indirect: Dict[str, List[dict]] = {}
     truncated = False
     for k in agents:
@@ -83,21 +121,26 @@ def build(report: dict) -> dict:
             frontier = nxt
             if not frontier:
                 break
-        indirect[k] = [{"type": t[0], "target": t[1], "path": p} for t, p in sorted(found.items())]
+        indirect[k] = [{"type": t[0], "target": t[1], "path": p, "state": "configured", "evidence": evid[p[-1]][t]}
+                       for t, p in sorted(found.items())]
     targets: Dict[Tuple[str, str], List[dict]] = {}
     for k in sorted(agents):
         for t in direct[k]:
-            targets.setdefault(t, []).append({"agent": k, "direct": True, "path": [k]})
+            targets.setdefault(t, []).append({"agent": k, "direct": True, "path": [k], "state": "configured", "evidence": evid[k][t]})
         for x in indirect[k]:
-            targets.setdefault((x["type"], x["target"]), []).append({"agent": k, "direct": False, "path": x["path"]})
+            targets.setdefault((x["type"], x["target"]), []).append({"agent": k, "direct": False, "path": x["path"],
+                                                                     "state": "configured", "evidence": x["evidence"]})
     complete = bool(report["complete"]) and not unresolved and not ambiguous and not truncated
     return scrub_tree({
-        "tool": "scopewake", "version": __version__, "kind": "reach-graph",
+        "tool": "scopewake", "version": __version__, "kind": "reach-graph", "semantics": SEMANTICS,
         "coverage": {"complete": complete, "scan_complete": bool(report["complete"]), "max_hops": MAX_HOPS,
                      "truncated": truncated, "unresolved_links": unresolved, "ambiguous_links": ambiguous},
         "note": "Reach is inferred from configuration and exports, not observed at runtime. An unresolved link means "
                 "reach through that agent is unknown, not absent.",
-        "agents": [{"agent": k, "direct": [list(t) for t in direct[k]], "calls": edges[k], "indirect": indirect[k]}
+        "agents": [{"agent": k, "direct": [list(t) for t in direct[k]], "calls": edges[k],
+                    "links": [{"to": m, "state": "configured", "declared_as": resolved_as[(k, m)],
+                               "evidence": link_ev[k].get(resolved_as[(k, m)], [])} for m in edges[k]],
+                    "indirect": indirect[k]}
                    for k in sorted(agents)],
         "targets": [{"type": t[0], "target": t[1], "reached_by": v} for t, v in sorted(targets.items())]})
 
@@ -157,7 +200,7 @@ def to_text(g: dict, markdown: bool = False) -> str:
         L += [f"{b}{safe(u['agent'], 160)} -> {safe(u['link'], 120)}: matches {len(u['candidates'])} agents" for u in cov["ambiguous_links"]]
     if cov["truncated"]:
         L += ["", f"Chains longer than {cov['max_hops']} agents were not followed."]
-    L += ["", g["note"]]
+    L += ["", g["semantics"]["meaning"], g["note"]]
     return "\n".join(L)
 
 
