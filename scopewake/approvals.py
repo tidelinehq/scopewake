@@ -196,8 +196,65 @@ def head_hash(ledger: dict) -> str:
     return log[-1]["hash"] if log else ""
 
 
-def verify_ledger(ledger: dict) -> dict:
-    """Check the integrity log: unbroken chain, and every current approval matches its latest logged record hash."""
+def verify_ledger(ledger: dict, expect_head: str = "") -> dict:
+    """Check the integrity log: unbroken chain, and every current approval matches its latest logged record hash.
+
+    A chain cannot show that its newest events were cut off, or that the whole file was swapped for an older copy:
+    both leave a chain that is internally intact. `expect_head` is a head hash stored outside the ledger. If it is
+    not in this chain, the ledger was rolled back or replaced.
+    """
+    res = _verify_chain(ledger)
+    want = expect_head.strip().lower()
+    if want and res["status"] != "no integrity log":
+        seqs = [ev.get("seq") for ev in ledger.get("log", []) if isinstance(ev, dict) and str(ev.get("hash", "")).lower() == want]
+        if not seqs:
+            res["problems"].append("the anchor hash is not in this ledger: it was rolled back to an earlier copy, replaced, or the anchor belongs to another ledger")
+            res["status"] = "tampered"
+            res["anchor"] = "not found"
+        else:
+            res["anchor"] = f"found at event {seqs[0]}; {res['events'] - seqs[0]} later event(s)"
+    elif want:
+        res["problems"].append("an anchor hash was given but this ledger has no integrity log to check it against")
+        res["status"] = "tampered"
+        res["anchor"] = "not found"
+    else:
+        res["anchor"] = "not checked (pass --expect-head with a head hash stored outside the ledger to detect rollback)"
+    return res
+
+
+def verify_pack(pack: dict) -> dict:
+    """Recompute an evidence pack's file hashes and re-check the ledger it carries. No trust in the manifest's own claims."""
+    problems = []
+    man, files = pack.get("manifest"), pack.get("files")
+    if not isinstance(man, dict) or not isinstance(files, dict) or not isinstance(man.get("sha256"), dict):
+        raise ValueError("not a scopewake evidence pack (expected 'manifest' with 'sha256', and 'files')")
+    for fn in sorted(set(man["sha256"]) | set(files)):
+        if fn not in files:
+            problems.append(f"{safe(fn, 80)}: listed in the manifest but missing from the pack")
+        elif fn not in man["sha256"]:
+            problems.append(f"{safe(fn, 80)}: in the pack but not in the manifest (added afterwards?)")
+        elif not isinstance(files[fn], str) or hashlib.sha256(files[fn].encode("utf-8")).hexdigest() != man["sha256"][fn]:
+            problems.append(f"{safe(fn, 80)}: contents do not match the manifest hash")
+    ledger_status = "no ledger in pack"
+    if isinstance(files.get("ledger.json"), str):
+        try:
+            led = json.loads(files["ledger.json"])
+            ver = _verify_chain(led) if isinstance(led, dict) else {"status": "tampered", "head": ""}
+        except (ValueError, RecursionError):
+            ver = {"status": "tampered", "head": ""}
+        ledger_status = ver["status"]
+        if ver["status"] == "tampered":
+            problems.append("ledger.json inside the pack fails its integrity check")
+        if ver.get("head", "") != str(man.get("ledger_head", "")):
+            problems.append("the ledger head in the manifest is not the head of the ledger in the pack")
+    return {"tool": "scopewake", "version": __version__, "kind": "pack-verification",
+            "status": "intact" if not problems else "tampered", "files": len(files), "ledger": ledger_status,
+            "created_utc": safe(man.get("created_utc", ""), 40), "problems": problems,
+            "note": "This shows the pack is internally consistent. It does not show who made it or when: anyone can rebuild "
+                    "a pack and its hashes. For that, sign the pack file with your own key and keep the signature apart."}
+
+
+def _verify_chain(ledger: dict) -> dict:
     problems, log = [], ledger.get("log")
     if not isinstance(log, list) or not log:
         return {"tool": "scopewake", "version": __version__, "kind": "ledger-verification", "status": "no integrity log",
@@ -236,6 +293,8 @@ def verify_text(res: dict) -> str:
     L = [f"scopewake verify-ledger: {res['status']} ({res['events']} event(s))"]
     if res.get("head"):
         L.append(f"head hash: {res['head']}  (store this outside the ledger as an anchor)")
+    if res.get("anchor"):
+        L.append(f"anchor: {res['anchor']}")
     if res.get("baseline_events"):
         L.append(f"{res['baseline_events']} approval(s) predate the log and are covered only from their baseline entry.")
     L += ["  ! " + p for p in res["problems"]]
@@ -273,6 +332,21 @@ def _reasons_for(old: dict, new: dict) -> List[dict]:
     return r
 
 
+IMPORT_VIA = ("defender:", "generic:")
+
+
+def recorded_with_import_defect(snap_agent: dict) -> bool:
+    """True for an imported agent frozen before imports kept each agent's own name (releases up to 0.4.0).
+
+    Those releases named every imported agent after the last row of the export. Snapshots written since carry an
+    `indirect` field, so its absence on an imported agent marks a record whose agent name cannot be relied on.
+    """
+    if "indirect" in snap_agent:
+        return False
+    caps = snap_agent.get("capabilities") or []
+    return any(isinstance(c, list) and len(c) == 2 and str(c[1]).startswith(IMPORT_VIA) for c in caps)
+
+
 def _indirect_reasons(old: dict, now: List[List[str]]) -> List[dict]:
     """Reach gained through another agent. Approvals recorded before indirect reach was tracked hold none and are not compared."""
     if "indirect" not in old:
@@ -300,6 +374,11 @@ def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS, 
         snap = {s.get("key") or agent_key(s): s for s in ap["snapshot"]["agents"]}
         now = {agent_key(a): a for a in current.values() if any(selects(s, a) for s in ap["agents"])}
         covered |= set(now)
+        stale_names = sorted(k for k, sn in snap.items() if recorded_with_import_defect(sn))
+        if stale_names:
+            reasons.append({"type": "recorded before the import naming fix",
+                            "detail": f"{len(stale_names)} imported agent(s) in this approval were recorded by a release that could "
+                                      "give imported agents the wrong name; re-import and approve again", "review": True})
         for k in sorted(set(snap) - set(now)):
             reasons.append({"type": "agent not found", "detail": f"{k}: confirm it was retired, or that the scan covered it", "review": False, "verify": True})
         for k in sorted(set(now) - set(snap)):

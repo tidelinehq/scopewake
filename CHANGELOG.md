@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Release gate. `review` marks an approval "re-review required" when it holds imported agents recorded before the import naming fix, so no affected approval can read as current. `verify-ledger --expect-head HASH` detects a ledger rolled back to an older copy or replaced, which the chain alone cannot see. New `verify-evidence PACK` recomputes every hash in an evidence pack and re-checks the ledger inside it. The reach graph is tested against an independent oracle on 400 random graphs, and every edge now states that it is configured reach and names the export or file it was read from.
 - `scopewake reach`: one graph across every agent in a scan or merged report. Shows who can reach a system, directly or through another agent the first one can call (`--to payments`), and what each agent reaches only through others. Formats: text, md, json, mermaid. `--fail-on-indirect` exits 1 for CI. Links that point outside the report are listed as unresolved, and the graph is marked incomplete: reach through them is unknown, not zero. Chains are followed up to five agents.
 - Approvals now freeze indirect reach. If an agent that an approved agent can call gains access, the approved agent's approval becomes "re-review required" (`indirect reach added`), even though its own configuration did not change. Approvals recorded earlier hold no indirect reach and are not compared until they are renewed.
 - `scopewake evidence` includes `reach.json` and `reach.md`.

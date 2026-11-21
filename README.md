@@ -190,6 +190,19 @@ An agent that can call another agent inherits what that agent can reach. `reach`
 
 Limits: links come from what an export declares (for example `ConnectedAgents`), not from observed calls. A link to an agent that is not in the report is listed as unresolved and the graph is marked incomplete, because reach through it is unknown. Import every platform's agents and `merge` them before relying on the answer.
 
+## Checking the evidence yourself
+
+```bash
+scopewake verify-ledger approvals.json --expect-head <hash you stored elsewhere>
+scopewake verify-evidence evidence-2026-11.json
+```
+
+The ledger is a hash chain. A chain shows edits, removals and reordering, but an older copy of the same ledger is also a valid chain. Store the head hash printed by `verify-ledger` outside the ledger (a ticket, an email) and pass it back with `--expect-head`: if that hash is not in the chain, the ledger was rolled back or replaced. `verify-evidence` recomputes each file's SHA-256 against the manifest and re-checks the ledger inside the pack.
+
+What this does not give you: proof of who made a pack or when. Scopewake does not sign anything, and anyone can rebuild a pack with fresh hashes. If you need that, sign the pack file with your own key (for example `ssh-keygen -Y sign` or `gpg --detach-sign`) and keep the signature apart from it.
+
+Reach states. Every edge in `scopewake reach` is *configured* reach: written in the agent's configuration or declared in an export, with the source named on the edge. It is not evidence that a connection works, that a call would be authorised, what the effective permission is, or that anything was invoked.
+
 ## Fixes as managed settings
 
 ```bash
