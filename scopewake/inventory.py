@@ -131,6 +131,7 @@ def import_inventory(path: str, source: str = "defender", mapping: Optional[Dict
             latest[aid] = (t, r)
     agents = []
     for aid, (_, r) in sorted(latest.items()):
+        name = str(r.get(cols["name"], "") or "").strip()   # per row: the loop above leaves `name` at the last row read
         plat = (platform or str(r.get(cols.get("platform", ""), "") or "") or source).strip()
         caps = []
         for field, prefix in CAP_PREFIX.items():

@@ -178,6 +178,18 @@ scopewake evidence . --approvals approvals.json --include platform-agents.json >
 
 Imported agents are not scored. Their reach is what the export declares: tools, data sources, permissions, MCP servers, connected agents, skills, channels and audience. Any addition, including a wider audience, makes the approval "re-review required". The `AgentsInfo` column names follow Microsoft's documentation; the inside of its JSON columns is not documented, so Scopewake reads names where it can and fingerprints every element, so a change still shows. System prompts (`Instructions`) are never copied. Deleted or uninstalled agents are dropped, and only the latest row per agent is kept.
 
+## Reach graph: who can reach it, directly or through another agent
+
+```bash
+scopewake reach --report all.json                    # shared reach, and reach gained through other agents
+scopewake reach --report all.json --to payments      # every agent that can reach a payments tool, with the path
+scopewake reach --report all.json --format mermaid   # a graph to paste into a ticket or README
+```
+
+An agent that can call another agent inherits what that agent can reach. `reach` joins the agents of one report (a scan, an import, or a `merge` of both) and follows those links, up to five agents deep. Once an approval is recorded, `review` also flags it when an agent it can call gains access (`indirect reach added`), although the approved agent's own configuration is unchanged.
+
+Limits: links come from what an export declares (for example `ConnectedAgents`), not from observed calls. A link to an agent that is not in the report is listed as unresolved and the graph is marked incomplete, because reach through it is unknown. Import every platform's agents and `merge` them before relying on the answer.
+
 ## Fixes as managed settings
 
 ```bash

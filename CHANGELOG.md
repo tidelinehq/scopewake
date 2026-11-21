@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- `scopewake reach`: one graph across every agent in a scan or merged report. Shows who can reach a system, directly or through another agent the first one can call (`--to payments`), and what each agent reaches only through others. Formats: text, md, json, mermaid. `--fail-on-indirect` exits 1 for CI. Links that point outside the report are listed as unresolved, and the graph is marked incomplete: reach through them is unknown, not zero. Chains are followed up to five agents.
+- Approvals now freeze indirect reach. If an agent that an approved agent can call gains access, the approved agent's approval becomes "re-review required" (`indirect reach added`), even though its own configuration did not change. Approvals recorded earlier hold no indirect reach and are not compared until they are renewed.
+- `scopewake evidence` includes `reach.json` and `reach.md`.
+- Fixed: `scopewake import` gave every imported agent the name of the last row in the export. Each agent now keeps its own name. Ledgers approved from an import with more than one agent should be re-approved, because their agent names were wrong.
+
 ## Unreleased (0.4.0)
 
 - `scopewake import`: turns an exported agent inventory into a Scopewake report, so approvals cover every agent type (Copilot Studio, Agentforce, in-house agents), not only coding agents found by `scan`. Preset for Microsoft Defender XDR `AgentsInfo` exports (CSV or JSON); `--source generic --map FIELD=COLUMN` for any other inventory. Reach = declared tools, data sources, permissions, MCP servers, connected agents, skills, channels and audience; elements are fingerprinted so undocumented changes still show. System prompts are never copied.

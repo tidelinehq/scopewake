@@ -115,6 +115,15 @@ def main(argv=None):
     v.add_argument("--by", default="", help="who in the designated control function made the decision")
     v.add_argument("--reason", default="")
     v.add_argument("--today", metavar="YYYY-MM-DD", help=argparse.SUPPRESS)
+    rc = sub.add_parser("reach", help="one graph across every agent: who can reach a system, directly or through another agent")
+    rc.add_argument("path", nargs="?", default=".", help="directory to scan (ignored with --report)")
+    rc.add_argument("--home", default=str(Path.home()))
+    rc.add_argument("--report", metavar="FILE", help="use a saved scan or merged report instead of scanning")
+    rc.add_argument("--aws-auth", metavar="FILE")
+    rc.add_argument("--aws-as", action="append", default=[], metavar="[AGENT=]PRINCIPAL")
+    rc.add_argument("--to", metavar="TEXT", help="only targets whose name contains TEXT, e.g. payments, stripe, secrets")
+    rc.add_argument("--format", choices=["text", "md", "json", "mermaid"], default="text")
+    rc.add_argument("--fail-on-indirect", action="store_true", help="exit 1 if any agent reaches something only through another agent (for CI)")
     vc = sub.add_parser("catalogue-diff", help="compare two vendor AI catalogue versions (monthly re-check log)")
     vc.add_argument("old")
     vc.add_argument("new")
@@ -151,6 +160,8 @@ def main(argv=None):
         return 0
     if args.cmd in ("approve", "review"):
         return _approvals(args)
+    if args.cmd == "reach":
+        return _reach(args)
     if args.cmd == "import":
         try:
             rep = invmod.import_inventory(args.file, args.source, invmod.parse_map(args.map), args.platform)
@@ -303,6 +314,35 @@ def _approvals(args):
     return 1 if args.fail_on_review and apv.needs_action(res) else 0
 
 
+def _reach(args):
+    from . import reach as rch
+    name = "scopewake reach"
+    try:
+        if args.report:
+            from .diff import _load
+            report = _load(args.report)
+        else:
+            agents, issues = _live(args)
+            report = normalize(json.loads(to_json(agents, issues)), "<scan>")
+        g = rch.build(report)
+        if args.to is not None:
+            if not args.to.strip():
+                raise ValueError("--to needs some text to match")
+            g = rch.select(g, args.to)
+    except (OSError, ValueError, RecursionError) as e:
+        print(f"{name}: {safe(e, 400)}", file=sys.stderr)
+        return 2
+    if args.format == "json":
+        print(json.dumps(g, indent=2))
+    elif args.format == "mermaid":
+        print(scrub(rch.to_mermaid(g)))
+    else:
+        print(scrub(rch.to_text(g, markdown=args.format == "md")))
+    if not g["coverage"]["complete"]:
+        print(f"{name}: incomplete; some reach could not be followed (see the output).", file=sys.stderr)
+    return 1 if args.fail_on_indirect and any(a["indirect"] for a in g["agents"]) else 0
+
+
 def _evidence(args):
     """Bundle scan, approval review, ledger check and compliance mapping, each with a SHA-256. Prints; writes nothing."""
     import hashlib
@@ -328,6 +368,10 @@ def _evidence(args):
     if extra:
         files["imported.json"] = json.dumps(scrub_tree({"inputs": [safe(f, 200) for f in args.include],
                                                         "agents": [a for r in extra for a in r.get("agents", [])]}), indent=2)
+    from . import reach as rch
+    graph = rch.build(report)
+    files["reach.json"] = json.dumps(graph, indent=2)
+    files["reach.md"] = scrub(rch.to_text(graph, markdown=True))
     rev, ver = None, None
     if ledger is not None:
         rev = apv.review(ledger, report, date.today(), refs=args.refs)
@@ -354,7 +398,7 @@ def _evidence(args):
         L = [f"# Scopewake evidence pack ({manifest['created_utc']})", "",
              f"Scan complete: {'yes' if not issues else 'NO, results may understate reach'}. "
              f"Ledger: {manifest['ledger_status']}" + (f", head {manifest['ledger_head']}" if manifest["ledger_head"] else "") + ".", ""]
-        for fn in ("scan.md", "review.md", "compliance.md"):
+        for fn in ("scan.md", "reach.md", "review.md", "compliance.md"):
             if fn in files:
                 L += [f"<!-- {fn} sha256 {digests[fn]} -->", files[fn], ""]
         L += ["## Manifest", "", "| File | SHA-256 |", "|---|---|"] + [f"| {fn} | `{h}` |" for fn, h in digests.items()]

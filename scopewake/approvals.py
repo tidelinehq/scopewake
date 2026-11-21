@@ -129,6 +129,10 @@ def approve(ledger: dict, report: dict, system: str, selectors: List[str], by: s
     if not chosen:
         raise ValueError("no agent in the scan matches " + ", ".join(safe(s, 60) for s in selectors))
     snap = [snapshot_agent(a) for a in sorted(chosen, key=agent_key)]
+    from .reach import build, indirect_by_agent   # local import: reach imports this module
+    ind = indirect_by_agent(build(report))
+    for s_ in snap:
+        s_["indirect"] = ind.get(s_["key"], [])
     rec = {"system": system, "owner": owner, "scope": scope, "agents": list(dict.fromkeys(selectors)),
            "approved_by": by, "approved_on": _iso(today), "valid_until": _iso(today + timedelta(days=valid_days)),
            "evidence": list(evidence or []), "note": note,
@@ -269,11 +273,26 @@ def _reasons_for(old: dict, new: dict) -> List[dict]:
     return r
 
 
+def _indirect_reasons(old: dict, now: List[List[str]]) -> List[dict]:
+    """Reach gained through another agent. Approvals recorded before indirect reach was tracked hold none and are not compared."""
+    if "indirect" not in old:
+        return []
+    before = {tuple(x) for x in old["indirect"] if isinstance(x, list) and len(x) == 3}
+    r = [{"type": "indirect reach added", "detail": f"{t} {label} through {via}", "review": True}
+         for t, label, via in sorted({tuple(x) for x in now} - before)]
+    gone = len(before - {tuple(x) for x in now})
+    if gone:
+        r.append({"type": "indirect reach reduced", "detail": f"{gone} item(s) no longer reachable through other agents", "review": False})
+    return r
+
+
 def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS, refs: str = "mas") -> dict:
     if refs not in REFS:
         raise ValueError("--refs must be one of: " + ", ".join(REFS))
     ref_change, ref_periodic, ref_approved = REFS[refs]
     current = report["agents"]
+    from .reach import build, indirect_by_agent
+    ind_now = indirect_by_agent(build(report))
     covered = set()
     rows = []
     for ap in ledger["approvals"]:
@@ -286,7 +305,7 @@ def review(ledger: dict, report: dict, today: date, soon_days: int = SOON_DAYS, 
         for k in sorted(set(now) - set(snap)):
             reasons.append({"type": "new agent under this approval", "detail": k, "review": True})
         for k in sorted(set(now) & set(snap)):
-            for x in _reasons_for(snap[k], now[k]):
+            for x in _reasons_for(snap[k], now[k]) + _indirect_reasons(snap[k], ind_now.get(k, [])):
                 x["detail"] = f"{k}: {x['detail']}"
                 reasons.append(x)
         until = _parse_date(ap["valid_until"], "valid_until")
